@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/fragment_favorites_root">
+
+    <TextView
+        android:id="@+id/fragment_favorites_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Filtering and ordering coming soon!"
+        android:padding="@dimen/mini_padding"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_favorites_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/fragment_favorites_header"/>
+
+    <View
+        android:id="@+id/fragment_history_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_margin"
+        android:background="@drawable/shape_gradient_top_shadow"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

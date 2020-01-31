@@ -1,0 +1,59 @@
+<resources>
+    <string name="app_preferences_file">com.philpot.nowplaying.preferences.key</string>
+
+    <string name="app_name">NowPlayingHistory</string>
+    <string name="service_name">NowPlayingHistoryService</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_main">History</string>
+    <string name="title_activity_main_favorites">Favorites</string>
+    <string name="activity_main_option_settings">Settings</string>
+    <string name="menu_confirm_delete">Delete</string>
+    <string name="menu_confirm_delete_all">Delete All</string>
+
+    <string name="google_maps_song_by_artist">%1$s by %2$s</string>
+
+    <string name="activity_main_needs_access">This app needs Notification Access in order to function properly</string>
+    <string name="search_title">Search</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="settings_songs_open_in">Songs will open to play in: </string>
+    <string name="setting_scroll_top_new_song">Scroll to top when new song is added</string>
+    <string name="setting_last_fm_integration">Use Last.FM to get album info</string>
+    <string name="setting_get_gps">Get GPS coordinates for new songs</string>
+    <string name="setting_battery_warning">May consume more battery</string>
+    <string name="setting_experimental_warning">Experimental. May consume more battery</string>
+    <string name="settings_last_fm_scrobbling_title">Last.FM Scrobbling</string>
+    <string name="settings_last_fm_scrobbling_subtitle">Coming Soon!</string>
+
+    <string name="viewholder_remove_item">Remove Song</string>
+    <string name="last_heard_message">Heard %1$s times. Last on %2$s</string>
+    <string name="error_opening_app">Error opening music app</string>
+
+
+    <string name="history_info_heard"> at %1$s</string>
+
+    <string name="add_widget">Add widget</string>
+
+    <string name="app_name_none">None</string>
+    <string name="app_name_default">Default App</string>
+    <string name="app_name_youtube">YouTube</string>
+    <string name="app_name_youtubemusic">YouTube Music</string>
+    <string name="app_name_googlemusic">Google Play Music</string>
+    <string name="app_name_spotify">Spotify</string>
+    <string name="app_name_pandoramusic">Pandora Music</string>
+    <string name="app_name_amazonmusic">Amazon Music</string>
+    <string name="app_name_deezer">Deezer</string>
+    <string name="app_name_soundcloud">SoundCloud</string>
+    <string name="app_name_applemusic">Apple Music</string>
+
+    <string name="favorites_order_newest_oldest">Newest to Oldest</string>
+    <string name="favorites_order_oldest_newest">Oldest to Newest</string>
+    <string name="favorites_order_most_least">Most heard to least</string>
+    <string name="favorites_order_least_most">Least heard to most</string>
+    <string name="favorites_view_holder_show_history">Show history</string>
+    <string name="favorites_view_holder_hide_history">Hide history</string>
+
+    <string name="lfm_api_key">3d2510a0fb1a07d23f616b8afd6c4fbd</string>
+    <string name="lfm_secret">b29c3895f730817f14fb82dd271f166b</string>
+</resources>

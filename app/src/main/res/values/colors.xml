@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1565C0</color>
+    <color name="colorAccent">#af4cad</color>
+    <color name="colorBackground">#FAFAFA</color>
+    <color name="dark_gray">#AAAAAA</color>
+    <color name="colorTextPrimary">#FFFFFF</color>
+    <color name="colorDisabled">#757575</color>
+    <color name="colorDisabledLight">#EEEEEE</color>
+
+    <color name="app_color_youtube">#FF0000</color>
+    <color name="app_color_youtube_music">#FF0000</color>
+    <color name="app_color_google_music">#F55831</color>
+    <color name="app_color_spotify">#1ED760</color>
+    <color name="app_color_pandoramusic">#1B86F6</color>
+    <color name="app_color_amazonmusic">#ff9900</color>
+    <color name="app_color_deezer">#FD457E</color>
+    <color name="app_color_soundcloud">#FF5500</color>
+    <color name="app_color_applemusic">#FB5D70</color>
+</resources>
