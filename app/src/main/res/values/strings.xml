@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_preferences_file">com.philpot.nowplaying.preferences.key</string>
+    <!--<string name="app_preferences_file">com.philpot.nowplaying.preferences.key</string>-->
 
     <string name="app_name">NowPlayingHistory</string>
     <string name="service_name">NowPlayingHistoryService</string>

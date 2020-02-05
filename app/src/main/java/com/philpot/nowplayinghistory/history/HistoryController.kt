@@ -1,17 +1,12 @@
 package com.philpot.nowplayinghistory.history
 
 import com.philpot.nowplayinghistory.db.dao.HistoryDao
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 import android.content.SharedPreferences
-import com.philpot.nowplayinghistory.db.manager.SongAlbumManager
+import com.philpot.nowplayinghistory.db2.manager.SongAlbumManager
 import com.philpot.nowplayinghistory.event.EventBus
-import com.philpot.nowplayinghistory.event.NewHistoryItemEvent
-import com.philpot.nowplayinghistory.event.SettingsChangedEvent
 import com.philpot.nowplayinghistory.model.Preferences
-import com.philpot.nowplayinghistory.util.TestRecordInsertUtil
 import com.philpot.nowplayinghistory.widget.RecyclerViewPaginationListener
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 /**
  * Created by MattPhilpot on 12/2/2017.
@@ -63,12 +58,13 @@ class HistoryController(private val historyDao: HistoryDao,
         eventBus.unregister(this)
     }
 
-    fun doDeleteHistoryItems(list: List<HistoryItem>) {
+    fun doDeleteHistoryItems(list: List<HistoryEntry>) {
         list.forEach {
             historyDao.delete(it)
         }
     }
 
+    /*
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(event: NewHistoryItemEvent) {
         view?.addHistoryItemToTop(event.historyItem)
@@ -80,6 +76,7 @@ class HistoryController(private val historyDao: HistoryDao,
             view?.updateListAdapterSettings()
         }
     }
+    */
 
     override fun isLoading(): Boolean = isCurrentlyLoading
 
@@ -95,7 +92,7 @@ class HistoryController(private val historyDao: HistoryDao,
         }.run()
     }
 
-    private fun getPaginatedListInternal(): List<HistoryItem> {
+    private fun getPaginatedListInternal(): List<HistoryEntry> {
         val itemList = historyDao.getPaginatedHistoryList(PAGE_SIZE, currentEndStamp)
         endOfPages = itemList.size < PAGE_SIZE
         if (!endOfPages) {
@@ -115,10 +112,10 @@ class HistoryController(private val historyDao: HistoryDao,
     }
 
     interface HistoryView {
-        fun replaceHistoryListWith(list: List<HistoryItem>)
-        fun addHistoryItemToTop(item: HistoryItem)
-        fun addHistoryItemsToTop(list: List<HistoryItem>)
-        fun addPaginatedHistory(list: List<HistoryItem>)
+        fun replaceHistoryListWith(list: List<HistoryEntry>)
+        fun addHistoryItemToTop(entry: HistoryEntry)
+        fun addHistoryItemsToTop(list: List<HistoryEntry>)
+        fun addPaginatedHistory(list: List<HistoryEntry>)
         fun updateListAdapterSettings()
     }
 }

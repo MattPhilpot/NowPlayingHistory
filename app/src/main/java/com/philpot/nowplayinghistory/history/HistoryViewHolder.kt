@@ -1,36 +1,25 @@
 package com.philpot.nowplayinghistory.history
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
-import android.graphics.Bitmap
-import android.support.v4.content.ContextCompat
-import android.view.View
-import com.github.salomonbrys.kodein.android.appKodein
-import com.github.salomonbrys.kodein.instance
-import com.philpot.nowplayinghistory.R
-import com.philpot.nowplayinghistory.info.AlbumArtCacheProvider
-import com.philpot.nowplayinghistory.info.NowPlayingArtProvider
-import com.philpot.nowplayinghistory.model.SongInfo
-import com.philpot.nowplayinghistory.model.HistoryItem
-import com.philpot.nowplayinghistory.util.Utils
+import androidx.recyclerview.widget.RecyclerView
 import com.philpot.nowplayinghistory.widget.DeletableViewHolder
-import com.philpot.nowplayinghistory.widget.RecyclerViewHolder
-import com.philpot.nowplayinghistory.widget.RecyclerViewItemDeleteToggled
-import com.philpot.nowplayinghistory.widget.favorite.FavoritableViewHolder
-import com.philpot.nowplayinghistory.widget.favorite.FavoriteButton
-import kotlinx.android.synthetic.main.viewholder_history_item.view.*
-import java.text.SimpleDateFormat
-import java.util.*
+
 
 /**
  * Created by MattPhilpot on 12/2/2017.
  */
-class HistoryViewHolder(itemView: View) : FavoritableViewHolder<HistoryItem>(itemView), DeletableViewHolder {
+class HistoryViewHolder() : RecyclerView.ViewHolder(), DeletableViewHolder {
 
+    /*
     var deleteToggledListener: RecyclerViewItemDeleteToggled<HistoryItem>? = null
     private var deleteEnabled = false
     private var lastFmEnabled = false
+    */
 
+    init {
+
+    }
+
+    /*
     override val favoriteView: FavoriteButton?
         get() = itemView?.viewholder_history_item_favorite
 
@@ -104,4 +93,5 @@ class HistoryViewHolder(itemView: View) : FavoritableViewHolder<HistoryItem>(ite
             itemView?.setBackgroundColor(toColor)
         }
     }
+    */
 }

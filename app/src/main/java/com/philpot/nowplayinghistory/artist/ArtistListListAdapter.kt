@@ -1,13 +1,13 @@
 package com.philpot.nowplayinghistory.artist
 
 import android.view.ViewGroup
-import com.philpot.nowplayinghistory.model.ArtistInfo
+import com.philpot.nowplayinghistory.model.Artist
 import com.philpot.nowplayinghistory.widget.RecyclerAdapter
 
 /**
  * Created by MattPhilpot on 12/13/2017.
  */
-class ArtistListListAdapter : RecyclerAdapter<ArtistInfo, ArtistListViewHolder>() {
+class ArtistListListAdapter : RecyclerAdapter<Artist, ArtistListViewHolder>() {
 
     override fun onBindViewHolder(holder: ArtistListViewHolder?, position: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

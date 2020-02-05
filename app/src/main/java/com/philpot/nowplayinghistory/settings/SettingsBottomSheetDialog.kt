@@ -3,28 +3,23 @@ package com.philpot.nowplayinghistory.settings
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.support.design.widget.BottomSheetDialog
-import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Switch
-import com.github.salomonbrys.kodein.android.appKodein
-import com.github.salomonbrys.kodein.instance
+import androidx.core.content.ContextCompat
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.philpot.nowplayinghistory.R
-import com.philpot.nowplayinghistory.event.SettingsChangedEvent
 import com.philpot.nowplayinghistory.model.MusicAppPreference
 import com.philpot.nowplayinghistory.model.Preferences
-import com.philpot.nowplayinghistory.util.ShortcutHelper
 import kotlinx.android.synthetic.main.layout_settings.*
-import org.greenrobot.eventbus.EventBus
+import org.kodein.di.android.closestKodein
 
 /**
  * Created by MattPhilpot on 11/1/2017.
  */
 class SettingsBottomSheetDialog(context: Context,
-                                private val permissionAcquirer: PermissionAcquirer,
-                                private val eventBus: EventBus) : BottomSheetDialog(context) {
+                                private val permissionAcquirer: PermissionAcquirer) : BottomSheetDialog(context) {
 
     private val preferences = context.getSharedPreferences(context.getString(R.string.app_preferences_file), Context.MODE_PRIVATE)
     private val editor = preferences.edit()
@@ -45,11 +40,11 @@ class SettingsBottomSheetDialog(context: Context,
             }
 
             override fun onItemSelected(p0: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                eventBus.post(SettingsChangedEvent(Preferences.CurrentMusicApp))
+                //eventBus.post(SettingsChangedEvent(Preferences.CurrentMusicApp))
                 editor.putInt(Preferences.CurrentMusicApp.value, position)
                 editor.apply()
-                val kodein = appKodein.invoke()
-                ShortcutHelper.updateShortcuts(context, kodein.instance(), kodein.instance())
+                val kodein = closestKodein(context)
+                //ShortcutHelper.updateShortcuts(context, kodein.instance(), kodein.instance())
             }
         }
 
@@ -81,7 +76,7 @@ class SettingsBottomSheetDialog(context: Context,
     private fun doLastFMCheckCangeListenerSetup() {
         layout_settings_lastfm_integration.isChecked = preferences.getBoolean(Preferences.LastFmIntegration.value, false)
         layout_settings_lastfm_integration.setOnCheckedChangeListener { _, b ->
-            eventBus.post(SettingsChangedEvent(Preferences.LastFmIntegration))
+            //eventBus.post(SettingsChangedEvent(Preferences.LastFmIntegration))
             editor.putBoolean(Preferences.LastFmIntegration.value, b)
             editor.apply()
         }
@@ -101,11 +96,9 @@ class SettingsBottomSheetDialog(context: Context,
     }
 
     fun onPermissionResults(permissions: Array<out String>, grantResults: IntArray) {
-        (0 until permissions.size)
+        (permissions.indices)
                 .filter { permissions[it] == Manifest.permission.ACCESS_FINE_LOCATION }
-                .forEach {
-                    setGPSEnablePref(grantResults[it] == PackageManager.PERMISSION_GRANTED)
-                }
+                .forEach { setGPSEnablePref(grantResults[it] == PackageManager.PERMISSION_GRANTED) }
     }
 
     interface PermissionAcquirer {

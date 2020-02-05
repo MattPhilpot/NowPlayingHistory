@@ -3,8 +3,6 @@ package com.philpot.nowplayinghistory.listener
 import android.Manifest
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import com.github.salomonbrys.kodein.android.appKodein
-import com.github.salomonbrys.kodein.instance
 import android.content.Intent
 import android.os.IBinder
 import android.content.ContentValues.TAG
@@ -19,23 +17,33 @@ import com.philpot.nowplayinghistory.db.dao.HistoryDao
 import com.philpot.nowplayinghistory.db.dao.SongInfoDao
 import com.philpot.nowplayinghistory.event.NewHistoryItemEvent
 import com.philpot.nowplayinghistory.info.AlbumArtCacheProvider
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 import com.philpot.nowplayinghistory.model.Preferences
-import com.philpot.nowplayinghistory.model.SongInfo
+import com.philpot.nowplayinghistory.model.Song
 import com.philpot.nowplayinghistory.util.ShortcutHelper
-import org.greenrobot.eventbus.EventBus
 import android.location.LocationManager
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import com.philpot.nowplayinghistory.BuildConfig
 import com.philpot.nowplayinghistory.R
-import com.philpot.nowplayinghistory.model.HistoryItemLocation
+import com.philpot.nowplayinghistory.model.HistoryEntryLocation
+import org.joda.time.DateTime
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
 
 
 /**
  * Created by colse on 10/29/2017.
  */
-class NowPlayingListener : NotificationListenerService() {
+class NowPlayingListener : NotificationListenerService(), KodeinAware {
+
+    private val parentKodein by closestKodein(applicationContext)
+
+    override val kodein: Kodein = Kodein.lazy {
+        extend(parentKodein)
+    }
+
 
     override fun onBind(mIntent: Intent): IBinder? {
         val mIBinder = super.onBind(mIntent)
@@ -104,32 +112,33 @@ class NowPlayingListener : NotificationListenerService() {
 
         val kodein = appKodein.invoke()
         val historyDao = kodein.instance<HistoryDao>()
-        val toAdd = HistoryItem(title = title, artist = artist, timestamp = System.currentTimeMillis())
+
+        val toAdd = HistoryEntry(title = title, artist = artist, timestamp = DateTime.now())
         if (historyDao.insertIfNotRepeat(toAdd)) {
             doHistoryItemUpdate(toAdd, historyDao, kodein.instance(), kodein.instance())
         }
     }
 
-    private fun doHistoryItemUpdate(item: HistoryItem, historyDao: HistoryDao, songInfoDao: SongInfoDao, albumArtProvider: AlbumArtCacheProvider) {
+    private fun doHistoryItemUpdate(entry: HistoryEntry, historyDao: HistoryDao, songInfoDao: SongInfoDao, albumArtProvider: AlbumArtCacheProvider) {
         try {
-            songInfoDao.updateLastHeard(item)
+            songInfoDao.updateLastHeard(entry)
             val preferences = applicationContext?.getSharedPreferences(getString(R.string.app_preferences_file), Context.MODE_PRIVATE) as SharedPreferences
-            doGPSIfAble(item, historyDao, preferences)
-            getAlbumArtForShortcuts(preferences, albumArtProvider, item, historyDao)
+            doGPSIfAble(entry, historyDao, preferences)
+            getAlbumArtForShortcuts(preferences, albumArtProvider, entry, historyDao)
         } catch (e : Exception) {
             // do nothing, just don't crash
         } finally {
-            EventBus.getDefault().post(NewHistoryItemEvent(item))
+            EventBus.getDefault().post(NewHistoryItemEvent(entry))
         }
     }
 
-    private fun doGPSIfAble(item: HistoryItem, historyDao: HistoryDao, preferences: SharedPreferences) {
+    private fun doGPSIfAble(entry: HistoryEntry, historyDao: HistoryDao, preferences: SharedPreferences) {
         if (preferences.getBoolean(Preferences.GPSEnable.value, false) &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let {
-                if (it.hasAccuracy() && item.timestamp - it.time < 300000) {
-                    saveHistoryItemWithLocation(it, item, historyDao)
+                if (it.hasAccuracy() && entry.timestamp - it.time < 300000) {
+                    saveHistoryItemWithLocation(it, entry, historyDao)
                     return
                 }
             }
@@ -138,7 +147,7 @@ class NowPlayingListener : NotificationListenerService() {
                 override fun onLocationChanged(location: Location?) {
                     location?.let {
                         if (it.hasAccuracy()) {
-                            saveHistoryItemWithLocation(it, item, historyDao)
+                            saveHistoryItemWithLocation(it, entry, historyDao)
                             locationManager.removeUpdates(this)
                             return
                         }
@@ -151,16 +160,16 @@ class NowPlayingListener : NotificationListenerService() {
         }
     }
 
-    private fun saveHistoryItemWithLocation(location: Location, item: HistoryItem, historyDao: HistoryDao) {
-        item.location = HistoryItemLocation(longitude = location.longitude, latitude = location.latitude, accuracy = location.accuracy)
-        historyDao.insertOrUpdate(item)
+    private fun saveHistoryItemWithLocation(location: Location, entry: HistoryEntry, historyDao: HistoryDao) {
+        entry.location = HistoryEntryLocation(longitude = location.longitude, latitude = location.latitude, accuracy = location.accuracy)
+        historyDao.insertOrUpdate(entry)
     }
 
-    private fun getAlbumArtForShortcuts(preferences: SharedPreferences, albumArtProvider: AlbumArtCacheProvider, item: HistoryItem, historyDao: HistoryDao) {
+    private fun getAlbumArtForShortcuts(preferences: SharedPreferences, albumArtProvider: AlbumArtCacheProvider, entry: HistoryEntry, historyDao: HistoryDao) {
         try {
             if (preferences.getBoolean(Preferences.LastFmIntegration.value, false)) {
-                albumArtProvider.getAlbumInfoAsync(item, object : AlbumArtCacheProvider.AlbumArtCallback {
-                    override fun onAlbumArtLoaded(bitmap: Bitmap?, songInfo: SongInfo) {
+                albumArtProvider.getAlbumInfoAsync(entry, object : AlbumArtCacheProvider.AlbumArtCallback {
+                    override fun onAlbumArtLoaded(bitmap: Bitmap?, song: Song) {
                         ShortcutHelper.updateShortcuts(applicationContext, historyDao, albumArtProvider)
                     }
                 })

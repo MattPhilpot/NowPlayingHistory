@@ -5,11 +5,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import com.philpot.nowplayinghistory.R
-import com.philpot.nowplayinghistory.db.dao.AlbumInfoDao
-import com.philpot.nowplayinghistory.db.dao.HistoryDao
-import com.philpot.nowplayinghistory.db.dao.SongInfoDao
-import com.philpot.nowplayinghistory.model.HistoryItem
-import com.philpot.nowplayinghistory.widget.favorite.FavoriteButton
+import com.philpot.nowplayinghistory.db2.dao.AlbumDao
+import com.philpot.nowplayinghistory.db2.dao.HistoryDao
+import com.philpot.nowplayinghistory.db2.dao.SongDao
+import com.philpot.nowplayinghistory.model.HistoryEntry
 import kotlinx.android.synthetic.main.bottom_sheet_song_info.view.*
 
 /**
@@ -18,10 +17,10 @@ import kotlinx.android.synthetic.main.bottom_sheet_song_info.view.*
 class SongInfoBottomSheet(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs, 0) {
 
     private var historyDao: HistoryDao? = null
-    private var songInfoDao: SongInfoDao? = null
-    private var albumInfoDao: AlbumInfoDao? = null
+    private var songInfoDao: SongDao? = null
+    private var albumInfoDao: AlbumDao? = null
 
-    var currentHistoryItem: HistoryItem? = null
+    var currentHistoryEntry: HistoryEntry? = null
         private set
 
     init {
@@ -29,8 +28,8 @@ class SongInfoBottomSheet(context: Context, attrs: AttributeSet? = null) : Linea
     }
 
     fun initialize(historyDao: HistoryDao,
-                   songInfoDao: SongInfoDao,
-                   albumInfoDao: AlbumInfoDao) {
+                   songInfoDao: SongDao,
+                   albumInfoDao: AlbumDao) {
         this.historyDao = historyDao
         this.songInfoDao = songInfoDao
         this.albumInfoDao = albumInfoDao
@@ -38,37 +37,37 @@ class SongInfoBottomSheet(context: Context, attrs: AttributeSet? = null) : Linea
 
     //fun getPeekHeight(): Int? = bottom_sheet_song_info_root?.measuredHeight
 
-    fun updateWith(historyItem: HistoryItem) {
-        currentHistoryItem = historyItem
-        bottom_sheet_song_info_title?.text = historyItem.title
-        bottom_sheet_song_info_artist?.text = historyItem.artist
+    fun updateWith(historyEntry: HistoryEntry) {
+        currentHistoryEntry = historyEntry
+        bottom_sheet_song_info_title?.text = historyEntry.title
+        bottom_sheet_song_info_artist?.text = historyEntry.artist
 
-        bottom_sheet_song_info_album?.text = historyItem.songInfo?.album ?:
-                historyItem.songInfo?.albumInfo?.title ?: ""
+        bottom_sheet_song_info_album?.text = historyEntry.songInfo?.album ?:
+                historyEntry.songInfo?.albumInfo?.title ?: ""
 
-        addHistoryChildren(historyItem)
+        addHistoryChildren(historyEntry)
 
-        historyItem.songInfo?.albumInfo?.albumBitmap?.let {
+        historyEntry.songInfo?.albumInfo?.albumBitmap?.let {
             bottom_sheet_song_info_album_art?.setImageBitmap(it)
             return
         }
         bottom_sheet_song_info_album_art?.setImageResource(R.drawable.ic_music_note_white)
     }
 
-    private fun addHistoryChildren(historyItem: HistoryItem) {
+    private fun addHistoryChildren(historyEntry: HistoryEntry) {
         bottom_sheet_song_info_history_root?.let { view ->
             view.removeAllViews()
             historyDao?.let { dao ->
-                for (each in dao.getLastNSongs(8, historyItem)) {
+                for (each in dao.getLastNSongs(8, historyEntry)) {
                     view.addView(getHistoryView(each))
                 }
             }
         }
     }
 
-    private fun getHistoryView(item: HistoryItem): View {
+    private fun getHistoryView(entry: HistoryEntry): View {
         val retVal = SongInfoHistoryItemView(context)
-        retVal.updateWith(item)
+        retVal.updateWith(entry)
         return retVal
     }
 

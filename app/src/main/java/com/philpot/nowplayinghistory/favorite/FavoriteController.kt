@@ -1,9 +1,8 @@
 package com.philpot.nowplayinghistory.favorite
 
 import android.content.SharedPreferences
-import com.philpot.nowplayinghistory.db.dao.HistoryDao
 import com.philpot.nowplayinghistory.db.dao.SongInfoDao
-import com.philpot.nowplayinghistory.model.SongInfo
+import com.philpot.nowplayinghistory.model.Song
 
 /**
  * Created by MattPhilpot on 12/2/2017.
@@ -27,6 +26,6 @@ class FavoriteController(private var view: FavoriteView?,
     }
 
     interface FavoriteView {
-        fun updateFavorites(list: List<SongInfo>)
+        fun updateFavorites(list: List<Song>)
     }
 }

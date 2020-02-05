@@ -3,24 +3,24 @@ package com.philpot.nowplayinghistory.history
 import android.util.LongSparseArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import com.philpot.nowplayinghistory.R
-import com.philpot.nowplayinghistory.db.manager.SongAlbumManager
-
-import com.philpot.nowplayinghistory.model.HistoryItem
-import com.philpot.nowplayinghistory.widget.*
+import com.philpot.nowplayinghistory.db2.manager.SongAlbumManager
+import com.philpot.nowplayinghistory.model.HistoryEntry
+import com.philpot.nowplayinghistory.widget.RecyclerSectionItemDecoration
+import com.philpot.nowplayinghistory.widget.RecyclerViewItemDeleteToggled
 import com.philpot.nowplayinghistory.widget.favorite.RecyclerViewItemFavoriteClicked
 import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * Created by MattPhilpot on 12/2/2017.
  */
 class HistoryListAdapter(private val songAlbumManager: SongAlbumManager) :
-        RecyclerAdapter<HistoryItem, HistoryViewHolder>(),
-        RecyclerSectionItemDecoration.SectionCallback,
-        RecyclerViewItemDeleteToggled<HistoryItem> {
+    ListAdapter<HistoryEntry, HistoryViewHolder>(),
+    RecyclerSectionItemDecoration.SectionCallback,
+    RecyclerViewItemDeleteToggled<HistoryEntry> {
 
-    private val deleteToggledList = LongSparseArray<HistoryItem>()
+    private val deleteToggledList = LongSparseArray<HistoryEntry>()
     var lastFmEnabled = false
         set(value) {
             songAlbumManager.allowLastFM = value
@@ -32,8 +32,8 @@ class HistoryListAdapter(private val songAlbumManager: SongAlbumManager) :
         get() = entityList.firstOrNull()?.timestamp
 
     init {
-        itemOnLongClick = object : RecyclerViewItemLongClicked<HistoryItem> {
-            override fun itemLongClicked(model: HistoryItem?, holder: RecyclerViewHolder<HistoryItem>): Boolean {
+        itemOnLongClick = object : RecyclerViewItemLongClicked<HistoryEntry> {
+            override fun itemLongClicked(model: HistoryEntry?, holder: RecyclerViewHolder<HistoryEntry>): Boolean {
                 model?.let {
                     if (holder is HistoryViewHolder) {
                         holder.toggleDelete(deleteToggled(it))
@@ -46,13 +46,13 @@ class HistoryListAdapter(private val songAlbumManager: SongAlbumManager) :
 
     fun isDeleteModeEnabled(): Boolean = deleteToggledList.size() > 0
 
-    internal fun deleteToggled(item: HistoryItem): Boolean {
-        return if (deleteToggledList.indexOfKey(item.timestamp) == -1) {
-            deleteToggledList.put(item.timestamp, item)
+    internal fun deleteToggled(entry: HistoryEntry): Boolean {
+        return if (deleteToggledList.indexOfKey(entry.timestamp) == -1) {
+            deleteToggledList.put(entry.timestamp, entry)
             confirmDeleteListener?.updateConfirmDelete()
             true
         } else {
-            deleteToggledList.remove(item.timestamp)
+            deleteToggledList.remove(entry.timestamp)
             confirmDeleteListener?.updateConfirmDelete()
             false
         }
@@ -77,8 +77,8 @@ class HistoryListAdapter(private val songAlbumManager: SongAlbumManager) :
 
             historyItem?.let {
                 viewHolder.updateWithItem(it, deleteToggledList.indexOfKey(it.timestamp) >= 0, lastFmEnabled)
-                viewHolder.setItemFavoriteListener(object : RecyclerViewItemFavoriteClicked<HistoryItem> {
-                    override fun itemFavoriteClicked(model: HistoryItem?, holder: RecyclerViewHolder<HistoryItem>, isFavorite: Boolean) {
+                viewHolder.setItemFavoriteListener(object : RecyclerViewItemFavoriteClicked<HistoryEntry> {
+                    override fun itemFavoriteClicked(model: HistoryEntry?, holder: RecyclerViewHolder<HistoryEntry>, isFavorite: Boolean) {
                         model?.songInfo?.let {
                             it.favorite = isFavorite
                             songAlbumManager.saveFavorite(it)
@@ -89,7 +89,7 @@ class HistoryListAdapter(private val songAlbumManager: SongAlbumManager) :
         }
     }
 
-    override fun getItemAt(position: Int): HistoryItem? {
+    override fun getItemAt(position: Int): HistoryEntry? {
         val retVal = super.getItemAt(position)
 
         retVal?.let {
@@ -127,20 +127,20 @@ class HistoryListAdapter(private val songAlbumManager: SongAlbumManager) :
         return ""
     }
 
-    fun replaceListWith(list: List<HistoryItem>) {
+    fun replaceListWith(list: List<HistoryEntry>) {
         entityList.clear()
         entityList.addAll(list)
         notifyDataSetChanged()
     }
 
-    override fun deleteToggled(model: HistoryItem?, holder: DeletableViewHolder) {
+    override fun deleteToggled(model: HistoryEntry?, holder: DeletableViewHolder) {
         model?.let {
             holder.toggleDelete(deleteToggled(it))
         }
     }
 
-    fun deleteAndReturnItems(): List<HistoryItem> {
-        val retVal = mutableListOf<HistoryItem>()
+    fun deleteAndReturnItems(): List<HistoryEntry> {
+        val retVal = mutableListOf<HistoryEntry>()
         (0 until deleteToggledList.size()).mapTo(retVal) { deleteToggledList.valueAt(it) }
         for(each in retVal.reversed()) {
             removeItem(each)

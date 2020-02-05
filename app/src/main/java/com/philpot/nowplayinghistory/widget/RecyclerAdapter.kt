@@ -1,11 +1,7 @@
 package com.philpot.nowplayinghistory.widget
 
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AlphaAnimation
-import android.widget.SearchView
-import com.philpot.nowplayinghistory.model.HistoryItem
 
 /**
  * Created by MattPhilpot on 10/30/2017.

@@ -3,7 +3,7 @@ package com.philpot.nowplayinghistory.util
 import com.philpot.nowplayinghistory.BuildConfig
 import com.philpot.nowplayinghistory.db.dao.HistoryDao
 import com.philpot.nowplayinghistory.db.dao.SongInfoDao
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 
 /**
  * Created by MattPhilpot on 11/2/2017.
@@ -17,7 +17,7 @@ object TestRecordInsertUtil {
                 return
             }
             */
-            val insertList = mutableListOf<HistoryItem>()
+            val insertList = mutableListOf<HistoryEntry>()
             insertIntoList(insertList, "Caught Up in You", ".38 Special")
             insertIntoList(insertList, "Fantasy Girl", ".38 Special")
             insertIntoList(insertList, "Hold On Loosely", ".38 Special")
@@ -662,9 +662,9 @@ object TestRecordInsertUtil {
         return System.currentTimeMillis()
     }
     
-    private fun insertIntoList(list: MutableList<HistoryItem>, title: String, artist: String) {
+    private fun insertIntoList(list: MutableList<HistoryEntry>, title: String, artist: String) {
         val previous = list.lastOrNull()
-        val newItem = HistoryItem(title = title, artist = artist, timestamp = getBackdatedTimestamp(previous?.timestamp))
+        val newItem = HistoryEntry(title = title, artist = artist, timestamp = getBackdatedTimestamp(previous?.timestamp))
         list.add(newItem)
     } 
 

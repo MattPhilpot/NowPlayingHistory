@@ -9,20 +9,25 @@ kotlin {
     }
 }
 
-def majorVersion = 1
-def minorVersion = 3
-def patchVersion = 7
+def majorVersion = 2
+def minorVersion = 1
+def patchVersion = 1
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '28.0.2'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
+
+    dataBinding {
+        enabled = true
+    }
+
     defaultConfig {
         applicationId "com.philpot.nowplayinghistory"
         minSdkVersion 27
-        targetSdkVersion 27
+        targetSdkVersion 29
         versionCode majorVersion * 1000 + minorVersion * 100 + patchVersion
         versionName "${majorVersion}.${minorVersion}.${patchVersion}"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         debug {
@@ -43,44 +48,68 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.1.0'
 
-    def kodeinVersion = '4.1.0'
-    def playServicesVersion = '27.0.2'
-    def storeIOVersion = '1.13.0'
-    def leakcanaryVersion = '1.5.4'
-    def greenRobotVersion = '3.0.0'
+    kapt "androidx.room:room-compiler:$rootProject.roomVersion"
+    //kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
+    implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha03"
+    implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
+    implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
+    implementation "androidx.fragment:fragment-ktx:$rootProject.fragmentVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$rootProject.savedstateVersion"
+    implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
+    implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navigationVersion"
+    implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerViewVersion"
+    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
+    implementation "androidx.room:room-ktx:$rootProject.roomVersion"
+    implementation "androidx.viewpager2:viewpager2:$rootProject.viewPagerVersion"
+    implementation "androidx.work:work-runtime-ktx:$rootProject.workVersion"
+    //implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+    implementation "com.google.android.material:material:$rootProject.materialVersion"
+    //*implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.coroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:${rootProject.coroutinesVersion}"
 
-    //implementation 'com.github.ag:lastfm-library:1.0.2'
-
-    implementation "org.greenrobot:eventbus:${greenRobotVersion}"
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    //joda time for android
+    implementation "net.danlew:android.joda:${rootProject.danlewJodaTimeVersion}"
 
     //dependency injection
-    implementation "com.github.salomonbrys.kodein:kodein:${kodeinVersion}"
-    implementation "com.github.salomonbrys.kodein:kodein-android:${kodeinVersion}"
+    implementation "org.kodein.di:kodein-di-erased-jvm:${rootProject.kodeinVersion}"
+    implementation "org.kodein.di:kodein-di-framework-android-x:${rootProject.kodeinVersion}"
 
-    //sqlite orm
-    implementation "com.pushtorefresh.storio:sqlite:${storeIOVersion}"
+    //trying out coil for image caching
+    implementation("io.coil-kt:coil:${rootProject.coilVersion}") {
+        exclude group: 'androidx.appcompat', module: 'appcompat-resources'
+    }
 
-    implementation "com.android.support:appcompat-v7:${playServicesVersion}"
-    implementation "com.android.support:design:${playServicesVersion}"
-    implementation "com.android.support:support-v13:${playServicesVersion}"
-    implementation "com.android.support:cardview-v7:${playServicesVersion}"
-
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-
+    //sqlcipher
+    implementation "net.zetetic:android-database-sqlcipher:${rootProject.sqlCipherVersion}"
     //for memoryleak testing
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:${leakcanaryVersion}"
-    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanaryVersion}"
-    testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanaryVersion}"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.leakCanaryVersion}"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.leakCanaryVersion}"
+    testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.leakCanaryVersion}"
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.17'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

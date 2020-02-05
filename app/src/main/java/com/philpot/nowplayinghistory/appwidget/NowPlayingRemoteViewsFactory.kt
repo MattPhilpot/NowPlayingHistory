@@ -10,7 +10,7 @@ import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.db.dao.HistoryDao
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 import com.philpot.nowplayinghistory.util.Utils
 
 /**
@@ -22,7 +22,7 @@ class NowPlayingRemoteViewsFactory(private val context: Context, private val int
 
     private val historyDao: HistoryDao = context.appKodein.invoke().instance()
 
-    private var historyList: List<HistoryItem> = arrayListOf()
+    private var historyList: List<HistoryEntry> = arrayListOf()
 
     override fun onCreate() {
         historyList = historyDao.getAll()

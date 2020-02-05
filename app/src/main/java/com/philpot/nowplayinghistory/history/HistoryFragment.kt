@@ -1,62 +1,58 @@
 package com.philpot.nowplayinghistory.history
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v4.content.ContextCompat
-import android.system.Os.bind
-import android.view.*
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.android.appKodein
-import com.github.salomonbrys.kodein.bind
-import com.github.salomonbrys.kodein.instance
-import com.github.salomonbrys.kodein.provider
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.activity.NowPlayingActivity
+import com.philpot.nowplayinghistory.databinding.FragmentHistoryBinding
 import com.philpot.nowplayinghistory.fragment.NowPlayingFragment
 import com.philpot.nowplayinghistory.info.bottomsheet.SongInfoBottomSheet
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 import com.philpot.nowplayinghistory.model.MusicAppPreference
 import com.philpot.nowplayinghistory.model.Preferences
-import com.philpot.nowplayinghistory.settings.SettingsBottomSheetDialog
 import com.philpot.nowplayinghistory.util.RecyclerViewInitializer
 import com.philpot.nowplayinghistory.util.Utils
-import com.philpot.nowplayinghistory.util.Utils.setVisibilityIfNeeded
 import com.philpot.nowplayinghistory.widget.RecyclerViewHolder
 import com.philpot.nowplayinghistory.widget.RecyclerViewItemClicked
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_history.*
+import org.kodein.di.Kodein
+import org.kodein.di.erased.bind
+import org.kodein.di.erased.instance
+import org.kodein.di.erased.provider
 
 /**
  * Created by MattPhilpot on 12/2/2017.
  */
 class HistoryFragment : NowPlayingFragment(), HistoryController.HistoryView {
 
-    override fun provideOverridingModule() = Kodein.Module {
-        bind<HistoryController>() with provider {
-            HistoryController(instance(), instance(), instance(), instance(), this@HistoryFragment)
-        }
-
+    override val kodein: Kodein = Kodein.lazy {
         bind<HistoryListAdapter>() with provider {
             HistoryListAdapter(instance())
         }
     }
 
-    override val fragmentTitle: Int = R.string.title_activity_main
-    override val fragmentTag: String = HistoryFragment::class.java.simpleName
-
     private val controller by instance<HistoryController>()
     private val listAdapter by instance<HistoryListAdapter>()
     private val preferences by instance<SharedPreferences>()
 
-    @SuppressLint("MissingSuperCall")
+    private lateinit var binding: FragmentHistoryBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentHistoryBinding.inflate(inflater, container, false).apply {
+            fragmentHistoryList.adapter = listAdapter
+        }
+
+        return binding.root
     }
 
     private fun enableDisableMenuItem(item: MenuItem?, enable: Boolean) {
@@ -92,10 +88,6 @@ class HistoryFragment : NowPlayingFragment(), HistoryController.HistoryView {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_history, container, false)
-    }
-
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -125,8 +117,8 @@ class HistoryFragment : NowPlayingFragment(), HistoryController.HistoryView {
 
         listAdapter.lastFmEnabled = preferences.getBoolean(Preferences.LastFmIntegration.value, false)
 
-        listAdapter.itemOnClick = object: RecyclerViewItemClicked<HistoryItem> {
-            override fun itemClicked(model: HistoryItem?, holder: RecyclerViewHolder<HistoryItem>) {
+        listAdapter.itemOnClick = object: RecyclerViewItemClicked<HistoryEntry> {
+            override fun itemClicked(model: HistoryEntry?, holder: RecyclerViewHolder<HistoryEntry>) {
                 model?.let {
                     if (listAdapter.isDeleteModeEnabled() && holder is HistoryViewHolder) {
                         holder.toggleDelete(listAdapter.deleteToggled(it))
@@ -205,25 +197,25 @@ class HistoryFragment : NowPlayingFragment(), HistoryController.HistoryView {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun addPaginatedHistory(list: List<HistoryItem>) {
+    override fun addPaginatedHistory(list: List<HistoryEntry>) {
         fragment_history_list?.post {
             listAdapter.addPaginatedList(list)
         }
     }
 
-    override fun addHistoryItemToTop(item: HistoryItem) {
-        listAdapter.addItem(item)
+    override fun addHistoryItemToTop(entry: HistoryEntry) {
+        listAdapter.addItem(entry)
         if (preferences.getBoolean(Preferences.ScrollToTop.value, false)) {
             fragment_history_list?.smoothScrollToPosition(0)
         }
     }
 
-    override fun replaceHistoryListWith(list: List<HistoryItem>) {
+    override fun replaceHistoryListWith(list: List<HistoryEntry>) {
         listAdapter.replaceListWith(list)
     }
 
 
-    override fun addHistoryItemsToTop(list: List<HistoryItem>) {
+    override fun addHistoryItemsToTop(list: List<HistoryEntry>) {
         listAdapter.addItemsToTop(list)
     }
 }

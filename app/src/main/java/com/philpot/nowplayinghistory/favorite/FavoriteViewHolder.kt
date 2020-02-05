@@ -3,19 +3,18 @@ package com.philpot.nowplayinghistory.favorite
 import android.view.View
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.info.bottomsheet.SongInfoHistoryItemView
-import com.philpot.nowplayinghistory.model.HistoryItem
-import com.philpot.nowplayinghistory.model.SongInfo
+import com.philpot.nowplayinghistory.model.HistoryEntry
+import com.philpot.nowplayinghistory.model.Song
 import com.philpot.nowplayinghistory.widget.RecyclerViewHolder
-import com.philpot.nowplayinghistory.util.Utils.setVisibilityIfNeeded
 import com.philpot.nowplayinghistory.widget.RecyclerViewItemExpandCollapseListener
 import kotlinx.android.synthetic.main.viewholder_favorite_item.view.*
 
 /**
  * Created by MattPhilpot on 12/2/2017.
  */
-class FavoriteViewHolder(itemView: View) : RecyclerViewHolder<SongInfo>(itemView) {
+class FavoriteViewHolder(itemView: View) : RecyclerViewHolder<Song>(itemView) {
 
-    var expandCollapseListener: RecyclerViewItemExpandCollapseListener<SongInfo>? = null
+    var expandCollapseListener: RecyclerViewItemExpandCollapseListener<Song>? = null
 
     init {
 
@@ -36,7 +35,7 @@ class FavoriteViewHolder(itemView: View) : RecyclerViewHolder<SongInfo>(itemView
         }
     }
 
-    override fun updateView(newEntity: SongInfo?) {
+    override fun updateView(newEntity: Song?) {
         itemView.viewholder_favorite_item_title?.text = newEntity?.title ?: ""
         itemView.viewholder_favorite_item_artist?.text = newEntity?.artist ?: ""
         itemView.viewholder_favorite_item_album?.text = newEntity?.album ?: ""
@@ -49,7 +48,7 @@ class FavoriteViewHolder(itemView: View) : RecyclerViewHolder<SongInfo>(itemView
             itemView.viewholder_favorite_item_click_to_expand_collapse?.setText(R.string.favorites_view_holder_show_history)
         }
 
-        newEntity?.albumInfo?.albumBitmap?.let {
+        newEntity?.album?.albumBitmap?.let {
             itemView.viewholder_favorite_item_album_art?.setImageBitmap(it)
             return
         }
@@ -57,7 +56,7 @@ class FavoriteViewHolder(itemView: View) : RecyclerViewHolder<SongInfo>(itemView
         itemView.viewholder_favorite_item_album_art?.setImageResource(R.drawable.ic_music_note_white)
     }
 
-    fun updateHistoryList(list: List<HistoryItem>?) {
+    fun updateHistoryList(list: List<HistoryEntry>?) {
         itemView.viewholder_favorite_item_history_root?.let { view ->
             view.removeAllViews()
 
@@ -67,9 +66,9 @@ class FavoriteViewHolder(itemView: View) : RecyclerViewHolder<SongInfo>(itemView
         }
     }
 
-    private fun getHistoryView(item: HistoryItem): View {
+    private fun getHistoryView(entry: HistoryEntry): View {
         val retVal = SongInfoHistoryItemView(itemView.context)
-        retVal.updateWith(item)
+        retVal.updateWith(entry)
         return retVal
     }
 

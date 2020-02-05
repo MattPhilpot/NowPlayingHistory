@@ -1,10 +1,10 @@
 package com.philpot.nowplayinghistory.event
 
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 
 /**
  * Created by colse on 10/30/2017.
  */
-class NewHistoryItemEvent(val historyItem: HistoryItem) {
+class NewHistoryItemEvent(val historyEntry: HistoryEntry) {
 
 }

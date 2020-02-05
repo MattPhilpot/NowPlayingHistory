@@ -9,14 +9,14 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
 import com.philpot.nowplayinghistory.R
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 import com.philpot.nowplayinghistory.model.MusicAppPreference
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import android.util.TypedValue
 import android.view.View
-import com.philpot.nowplayinghistory.model.SongInfo
+import com.philpot.nowplayinghistory.model.Song
 
 
 /**
@@ -24,7 +24,7 @@ import com.philpot.nowplayinghistory.model.SongInfo
  */
 object Utils {
 
-    fun startMusicAppIntent(context: Context, item: SongInfo, preference: MusicAppPreference) {
+    fun startMusicAppIntent(context: Context, item: Song, preference: MusicAppPreference) {
         if (preference == MusicAppPreference.None) {
             return
         }
@@ -32,28 +32,28 @@ object Utils {
         Utils.startMusicAppIntent(preference.packageName, getIntentFor(item), context)
     }
 
-    fun startMusicAppIntent(context: Context, item: HistoryItem, preference: MusicAppPreference) {
+    fun startMusicAppIntent(context: Context, entry: HistoryEntry, preference: MusicAppPreference) {
         if (preference == MusicAppPreference.None) {
             return
         }
 
-        Utils.startMusicAppIntent(preference.packageName, getIntentFor(item), context)
+        Utils.startMusicAppIntent(preference.packageName, getIntentFor(entry), context)
     }
 
-    fun getIntentFor(item: HistoryItem): Intent {
+    fun getIntentFor(entry: HistoryEntry): Intent {
         val intent = Intent()
 
         intent.action = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
-        intent.putExtra(SearchManager.QUERY, item.artist + " " + item.title)
+        intent.putExtra(SearchManager.QUERY, entry.artist + " " + entry.title)
         intent.putExtra(MediaStore.EXTRA_MEDIA_FOCUS, "vnd.android.cursor.item/audio")
-        intent.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, item.artist)
-        intent.putExtra(MediaStore.EXTRA_MEDIA_TITLE, item.title)
+        intent.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, entry.artist)
+        intent.putExtra(MediaStore.EXTRA_MEDIA_TITLE, entry.title)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
 
         return intent
     }
 
-    fun getIntentFor(item: SongInfo): Intent {
+    fun getIntentFor(item: Song): Intent {
         val intent = Intent()
 
         intent.action = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH

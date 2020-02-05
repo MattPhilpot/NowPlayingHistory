@@ -1,13 +1,9 @@
 package com.philpot.nowplayinghistory.widget
 
 import android.content.Context
-import android.view.animation.DecelerateInterpolator
-import android.widget.Scroller
-import java.lang.reflect.AccessibleObject.setAccessible
-import android.support.v4.view.ViewPager
 import android.util.AttributeSet
 import android.view.MotionEvent
-
+import androidx.viewpager.widget.ViewPager
 
 
 /**

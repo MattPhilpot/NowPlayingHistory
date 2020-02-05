@@ -2,7 +2,6 @@ package com.philpot.nowplayinghistory.favorite
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.transition.Transition
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import com.github.salomonbrys.kodein.provider
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.fragment.NowPlayingFragment
 import com.philpot.nowplayinghistory.model.Preferences
-import com.philpot.nowplayinghistory.model.SongInfo
+import com.philpot.nowplayinghistory.model.Song
 import com.philpot.nowplayinghistory.util.RecyclerViewInitializer
 import com.philpot.nowplayinghistory.widget.RecyclerViewHolder
 import com.philpot.nowplayinghistory.widget.RecyclerViewItemClicked
@@ -52,8 +51,8 @@ class FavoriteFragment : NowPlayingFragment(), FavoriteController.FavoriteView {
 
         listAdapter.lastFmEnabled = preferences.getBoolean(Preferences.LastFmIntegration.value, false)
 
-        listAdapter.itemOnClick = object : RecyclerViewItemClicked<SongInfo> {
-            override fun itemClicked(model: SongInfo?, holder: RecyclerViewHolder<SongInfo>) {
+        listAdapter.itemOnClick = object : RecyclerViewItemClicked<Song> {
+            override fun itemClicked(model: Song?, holder: RecyclerViewHolder<Song>) {
 
             }
         }
@@ -74,7 +73,7 @@ class FavoriteFragment : NowPlayingFragment(), FavoriteController.FavoriteView {
         }
     }
 
-    override fun updateFavorites(list: List<SongInfo>) {
+    override fun updateFavorites(list: List<Song>) {
         activity?.runOnUiThread {
             listAdapter.replaceListWith(list)
         }

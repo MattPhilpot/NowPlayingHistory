@@ -9,7 +9,7 @@ import com.philpot.nowplayinghistory.BuildConfig
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.db.dao.HistoryDao
 import com.philpot.nowplayinghistory.info.AlbumArtCacheProvider
-import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.model.HistoryEntry
 import com.philpot.nowplayinghistory.model.MusicAppPreference
 import com.philpot.nowplayinghistory.model.Preferences
 
@@ -50,9 +50,9 @@ object ShortcutHelper {
         shortcutManager.dynamicShortcuts = shortCutList
     }
 
-    private fun getShortCutIcon(context: Context, item: HistoryItem, albumArtProvider: AlbumArtCacheProvider?): Icon {
+    private fun getShortCutIcon(context: Context, entry: HistoryEntry, albumArtProvider: AlbumArtCacheProvider?): Icon {
         try {
-            albumArtProvider?.attemptCacheFetch(item)?.let {
+            albumArtProvider?.attemptCacheFetch(entry)?.let {
                 return Icon.createWithBitmap(it)
             }
         } catch (e: Exception) {

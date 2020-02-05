@@ -14,12 +14,12 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.support.annotation.ColorInt
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.util.AttributeSet
 import android.widget.ImageView
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import com.philpot.nowplayinghistory.R
 
 
@@ -203,7 +203,7 @@ class CircleImageView : ImageView {
         initializeBitmap()
     }
 
-    override fun setImageURI(uri: Uri) {
+    override fun setImageURI(uri: Uri?) {
         super.setImageURI(uri)
         initializeBitmap()
     }
