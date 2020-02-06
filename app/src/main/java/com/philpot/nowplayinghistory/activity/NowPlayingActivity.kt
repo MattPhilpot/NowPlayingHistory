@@ -2,10 +2,12 @@ package com.philpot.nowplayinghistory.activity
 
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
-import kotlinx.android.synthetic.main.activity_main.*
 import android.view.Menu
 import android.view.MenuItem
 import com.philpot.nowplayinghistory.settings.SettingsBottomSheetDialog
@@ -14,20 +16,24 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.philpot.nowplayinghistory.R
+import com.philpot.nowplayinghistory.listener.NowPlayingListener
 import kotlinx.android.synthetic.main.activity_main2.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
+import org.kodein.di.direct
+import org.kodein.di.erased.bind
+import org.kodein.di.erased.instance
+import org.kodein.di.erased.provider
 
 
 class NowPlayingActivity : AppCompatActivity(),
     KodeinAware,
-    NowPlayingController.NowPlayingView,
     SettingsBottomSheetDialog.PermissionAcquirer {
 
     companion object {
         private val TAG = NowPlayingActivity::class.java.simpleName
-        val REQUEST_CODE = 113377
+        val REQUEST_CODE = 1377
     }
 
     private val parentKodein by closestKodein()
@@ -37,28 +43,21 @@ class NowPlayingActivity : AppCompatActivity(),
     }
 
     private var accessSnackbar: Snackbar? = null
-
     private var dialog: SettingsBottomSheetDialog? = null
 
-    private fun enableDisableMenuItem(item: MenuItem?, enable: Boolean) {
-        item?.let {
-            it.isEnabled = enable
-            it.isVisible = enable
-        }
-    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_main_options, menu)
-        val searchItem = menu.findItem(R.id.search)
+        //val searchItem = menu.findItem(R.id.search)
 
-        enableDisableMenuItem(menu.findItem(R.id.activity_main_option_settings), true)
+        //enableDisableMenuItem(menu.findItem(R.id.activity_main_option_settings), true)
         //enableDisableMenuItem(searchItem, !deleteModeEnabled)
-        enableDisableMenuItem(searchItem, false)
+        //enableDisableMenuItem(searchItem, false)
 
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when(item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when(item.itemId) {
         R.id.activity_main_option_settings -> {
             showMenu()
             true
@@ -73,18 +72,15 @@ class NowPlayingActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
 
-        setActionBar(activity_main_toolbar)
+        setSupportActionBar(activity_main_toolbar)
 
         val navController = Navigation.findNavController(this, R.id.activity_main_nav_host)
         activity_acg_main_bottom_nav?.setupWithNavController(navController)
 
-        dialog = SettingsBottomSheetDialog(this, this)//, EventBus.getDefault())
-    }
+        dialog = SettingsBottomSheetDialog(this, this, direct.instance(), direct.instance())//, EventBus.getDefault())
 
-    private fun showPage(position: Int) {
-        activity_main_viewpager?.currentItem = position
+        checkNotificationService()
     }
-
 
     @SuppressLint("MissingSuperCall")
     override fun onDestroy() {
@@ -93,7 +89,20 @@ class NowPlayingActivity : AppCompatActivity(),
         dialog = null
     }
 
-    override fun showNotificationAccessDialog() {
+    private fun checkNotificationService() {
+        if (isNotifyServiceEnabled()) {
+            hideNotificationAccessDialog()
+        } else {
+            showNotificationAccessDialog()
+        }
+    }
+
+    private fun isNotifyServiceEnabled(): Boolean {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        return notificationManager.isNotificationListenerAccessGranted(ComponentName(packageName, NowPlayingListener::class.java.name))
+    }
+
+    private fun showNotificationAccessDialog() {
         accessSnackbar?.let {
             if (it.isShown) {
                 return
@@ -103,7 +112,7 @@ class NowPlayingActivity : AppCompatActivity(),
         }
 
         accessSnackbar = Snackbar.make(
-            activity_main_list_root,
+            activity_main_coordinator_root,
             R.string.activity_main_needs_access,
             Snackbar.LENGTH_INDEFINITE)
             .setAction(android.R.string.ok) {
@@ -111,7 +120,7 @@ class NowPlayingActivity : AppCompatActivity(),
         }.apply { show() }
     }
 
-    override fun hideNotificationAccessDialog() {
+    private fun hideNotificationAccessDialog() {
         accessSnackbar?.dismiss()
     }
 

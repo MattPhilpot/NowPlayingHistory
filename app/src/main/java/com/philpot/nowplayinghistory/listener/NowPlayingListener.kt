@@ -1,11 +1,11 @@
 package com.philpot.nowplayinghistory.listener
 
 import android.Manifest
+import android.app.DownloadManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.content.Intent
 import android.os.IBinder
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -13,37 +13,43 @@ import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationListener
 import android.util.Log
-import com.philpot.nowplayinghistory.db.dao.HistoryDao
-import com.philpot.nowplayinghistory.db.dao.SongInfoDao
-import com.philpot.nowplayinghistory.event.NewHistoryItemEvent
-import com.philpot.nowplayinghistory.info.AlbumArtCacheProvider
 import com.philpot.nowplayinghistory.model.HistoryEntry
-import com.philpot.nowplayinghistory.model.Preferences
-import com.philpot.nowplayinghistory.model.Song
+import com.philpot.nowplayinghistory.model.SongInfo
 import com.philpot.nowplayinghistory.util.ShortcutHelper
 import android.location.LocationManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.philpot.nowplayinghistory.BuildConfig
 import com.philpot.nowplayinghistory.R
+import com.philpot.nowplayinghistory.db2.NowPlayingDatabase
+import com.philpot.nowplayinghistory.db2.dao.HistoryDao
+import com.philpot.nowplayinghistory.db2.dao.ParameterDao
+import com.philpot.nowplayinghistory.db2.dao.SongInfoDao
+import com.philpot.nowplayinghistory.lastfm.LfmError
+import com.philpot.nowplayinghistory.lastfm.LfmParameters
+import com.philpot.nowplayinghistory.lastfm.LfmRequest
+import com.philpot.nowplayinghistory.lastfm.api.LfmApi
+import com.philpot.nowplayinghistory.model.AlbumInfo
+import com.philpot.nowplayinghistory.model.ArtistInfo
 import com.philpot.nowplayinghistory.model.HistoryEntryLocation
+import com.philpot.nowplayinghistory.model.param.ParameterType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 /**
  * Created by colse on 10/29/2017.
  */
-class NowPlayingListener : NotificationListenerService(), KodeinAware {
+class NowPlayingListener : NotificationListenerService() {
 
-    private val parentKodein by closestKodein(applicationContext)
-
-    override val kodein: Kodein = Kodein.lazy {
-        extend(parentKodein)
+    private val database by lazy {
+        NowPlayingDatabase.getInstance(applicationContext)
     }
-
 
     override fun onBind(mIntent: Intent): IBinder? {
         val mIBinder = super.onBind(mIntent)
@@ -90,54 +96,68 @@ class NowPlayingListener : NotificationListenerService(), KodeinAware {
     }
 
     private fun saveNewEntry(entry: String) {
-        val split = entry.split(" by ")
+        CoroutineScope(Dispatchers.IO).launch {
+            val split = entry.split(" by ")
 
-        if (split.size < 2) {
-            return
-        }
-
-        var title = ""
-        val artist = split.last()
-
-        for (i in 0..split.size - 2) {
-            if (title.isNotBlank()) {
-                title += " by "
+            if (split.size < 2) {
+                return@launch
             }
-            title += split[i]
-        }
 
-        if (title.isBlank() || artist.isBlank()) {
-            return
-        }
+            var title = ""
+            val artist = split.last()
 
-        val kodein = appKodein.invoke()
-        val historyDao = kodein.instance<HistoryDao>()
+            for (i in 0..split.size - 2) {
+                if (title.isNotBlank()) {
+                    title += " by "
+                }
+                title += split[i]
+            }
 
-        val toAdd = HistoryEntry(title = title, artist = artist, timestamp = DateTime.now())
-        if (historyDao.insertIfNotRepeat(toAdd)) {
-            doHistoryItemUpdate(toAdd, historyDao, kodein.instance(), kodein.instance())
+            if (title.isBlank() || artist.isBlank()) {
+                return@launch
+            }
+
+            val artistDao = database.artistDao()
+            val songDao = database.songDao()
+            val historyDao = database.historyDao()
+
+            //insert artist if it doesn't exist
+            val artistInfo = ArtistInfo(name = artist, info = "")
+            artistDao.insertOrUpdate(artistInfo)
+
+            //insert song if it doesn't exist
+            val songInfo = SongInfo(
+                title = title,
+                artist = artist)
+            val songInfoId = songDao.insertOrUpdate(songInfo)
+
+            val toAdd = HistoryEntry(timestamp = DateTime.now(), songId = songInfoId, artist = artist)
+            historyDao.insertIfNotRepeat(toAdd)?.let { id ->
+                toAdd.id = id
+                doHistoryItemUpdate(toAdd, historyDao, songInfo, songDao)
+            }
         }
     }
 
-    private fun doHistoryItemUpdate(entry: HistoryEntry, historyDao: HistoryDao, songInfoDao: SongInfoDao, albumArtProvider: AlbumArtCacheProvider) {
+    private fun doHistoryItemUpdate(entry: HistoryEntry, historyDao: HistoryDao, songInfo: SongInfo, songInfoDao: SongInfoDao) {
         try {
-            songInfoDao.updateLastHeard(entry)
-            val preferences = applicationContext?.getSharedPreferences(getString(R.string.app_preferences_file), Context.MODE_PRIVATE) as SharedPreferences
-            doGPSIfAble(entry, historyDao, preferences)
-            getAlbumArtForShortcuts(preferences, albumArtProvider, entry, historyDao)
+            //songInfoDao.updateLastHeard(entry) //don't need anymore I think
+            val parameterDao = database.parameterDao()
+            doGPSIfAble(entry, historyDao, parameterDao)
+            getAlbumArtForShortcuts(parameterDao, songInfo, songInfoDao, historyDao)
         } catch (e : Exception) {
             // do nothing, just don't crash
         } finally {
-            EventBus.getDefault().post(NewHistoryItemEvent(entry))
+            //EventBus.getDefault().post(NewHistoryItemEvent(entry))
         }
     }
 
-    private fun doGPSIfAble(entry: HistoryEntry, historyDao: HistoryDao, preferences: SharedPreferences) {
-        if (preferences.getBoolean(Preferences.GPSEnable.value, false) &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    private fun doGPSIfAble(entry: HistoryEntry, historyDao: HistoryDao, parameterDao: ParameterDao) {
+        val gpsEnabled = parameterDao.getById(ParameterType.GPSEnable.code)?.value?.toBoolean() ?: false
+        if (gpsEnabled && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let {
-                if (it.hasAccuracy() && entry.timestamp - it.time < 300000) {
+                if (it.hasAccuracy() && entry.timestamp.millis - it.time < 300000) {
                     saveHistoryItemWithLocation(it, entry, historyDao)
                     return
                 }
@@ -165,17 +185,16 @@ class NowPlayingListener : NotificationListenerService(), KodeinAware {
         historyDao.insertOrUpdate(entry)
     }
 
-    private fun getAlbumArtForShortcuts(preferences: SharedPreferences, albumArtProvider: AlbumArtCacheProvider, entry: HistoryEntry, historyDao: HistoryDao) {
+
+    private fun getAlbumArtForShortcuts(parameterDao: ParameterDao, songInfo: SongInfo, songInfoDao: SongInfoDao, historyDao: HistoryDao) {
         try {
-            if (preferences.getBoolean(Preferences.LastFmIntegration.value, false)) {
-                albumArtProvider.getAlbumInfoAsync(entry, object : AlbumArtCacheProvider.AlbumArtCallback {
-                    override fun onAlbumArtLoaded(bitmap: Bitmap?, song: Song) {
-                        ShortcutHelper.updateShortcuts(applicationContext, historyDao, albumArtProvider)
-                    }
-                })
+            val lastFMEnabled = parameterDao.getById(ParameterType.LastFmIntegration.code)?.value?.toBoolean() ?: false
+            if (lastFMEnabled) {
+
+                getAlbumInfo(songInfo, false)
             }
         } catch (e : Exception) {
-            ShortcutHelper.updateShortcuts(applicationContext, historyDao, albumArtProvider)
+            ShortcutHelper.updateShortcuts(applicationContext, historyDao, songInfoDao)
         }
     }
 
@@ -187,5 +206,90 @@ class NowPlayingListener : NotificationListenerService(), KodeinAware {
         if (BuildConfig.DEBUG) {
             Log.i(TAG, message)
         }
+    }
+
+    private fun getAlbumInfo(item: SongInfo, trimTitle: Boolean = false) {
+        val params = LfmParameters()
+        params["artist"] = item.artist
+        params["track"] = getSearchTitle(item.title, trimTitle)
+
+        val request = LfmApi.track().getInfo(params)
+        request.executeWithListener(object : LfmRequest.LfmRequestListener() {
+            override fun onComplete(response: JSONObject) {
+                getAlbumInfoFrom(item, response, params, trimTitle)
+            }
+
+            override fun onError(error: LfmError) {
+                /*
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, error.errorMessage ?: "no error")
+                }
+                */
+                if (!trimTitle) {
+                    getAlbumInfo(item, true)
+                }
+            }
+        })
+    }
+
+    private fun getAlbumInfoFrom(songInfo: SongInfo,
+                                 trackResponse: JSONObject,
+                                 params: LfmParameters,
+                                 repeatAttempt: Boolean) {
+        try {
+            val albumTitle = (((trackResponse["track"] as JSONObject).get("album")) as JSONObject).get("title").toString()
+            val albumDao = database.albumDao()
+            val currentAlbum = albumDao.getByArtistAndTitle(songInfo.artist, albumTitle)
+                ?: AlbumInfo(title = albumTitle, artist = songInfo.artist, year = null, albumArtPath = null)
+            currentAlbum.id = albumDao.insertOrUpdate(currentAlbum)
+            songInfo.albumId = currentAlbum.id
+            database.songDao().insertOrUpdate(songInfo)
+            //songInfo.album = albumInfoDao.getAlbumInfoFrom(songInfo)
+
+
+            params["album"] = albumTitle
+            val request = LfmApi.album().getInfo(params)
+            request.executeWithListener(object : LfmRequest.LfmRequestListener() {
+                override fun onComplete(response: JSONObject) {
+                    currentAlbum.albumArtPath = (((response.get("album") as JSONObject).get("image") as JSONArray)[1] as JSONObject).get("#text").toString()
+                    albumDao.update(currentAlbum)
+                }
+
+                override fun onError(error: LfmError) {
+                    /*
+                    if (BuildConfig.DEBUG) {
+
+                    }
+                    */
+                    Log.i(TAG, error.errorMessage ?: "no error")
+                }
+            })
+
+        } catch (e: Exception) {
+            if (!repeatAttempt) {
+                getAlbumInfo(songInfo, true)
+            }
+        }
+    }
+
+    private fun getSearchTitle(title: String, trimTitle: Boolean): String {
+        if (!trimTitle) {
+            return title
+        }
+
+        var retVal = title
+        if (retVal.contains("(")) {
+            retVal = title.substring(0, title.indexOf("("))
+        }
+
+        if (retVal.contains("[")) {
+            retVal = title.substring(0, title.indexOf("["))
+        }
+        return retVal
+    }
+
+
+    companion object {
+        private val TAG = NowPlayingListener::class.java.simpleName
     }
 }

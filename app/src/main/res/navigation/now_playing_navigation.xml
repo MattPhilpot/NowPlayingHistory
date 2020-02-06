@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/now_playing_navigation">
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/now_playing_navigation"
+    app:startDestination="@id/history2Fragment">
 
+    <fragment
+        android:id="@+id/history2Fragment"
+        android:name="com.philpot.nowplayinghistory.history2.History2Fragment"
+        android:label="History2Fragment" />
 </navigation>

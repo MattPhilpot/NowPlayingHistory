@@ -3,56 +3,96 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-
+        <variable
+            name="loading"
+            type="Boolean" />
+        <variable
+            name="hasContentToDisplay"
+            type="Boolean" />
+        <variable
+            name="viewModel"
+            type="com.philpot.nowplayinghistory.history2.History2ViewModel" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/activity_main_root">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/fragment_history_list"
+        android:layout_height="match_parent">
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/viewholder_history_item"/>
+            app:isGone="@{!hasContentToDisplay}"
+            android:id="@+id/activity_main_root">
 
-        <!--
-        <View
-            android:id="@+id/fragment_history_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_margin"
-            android:background="@drawable/shape_gradient_top_shadow"
-            app:layout_anchor="@id/fragment_history_song_info"
-            app:layout_anchorGravity="top" />
-        -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fragment_history_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/viewholder_history_item" />
+            <!--
+            <View
+                android:id="@+id/fragment_history_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/widget_margin"
+                android:background="@drawable/shape_gradient_top_shadow"
+                app:layout_anchor="@id/fragment_history_song_info"
+                app:layout_anchorGravity="top" />
+            -->
 
-        <com.philpot.nowplayinghistory.info.bottomsheet.SongInfoBottomSheet
-            android:id="@+id/fragment_history_song_info"
+            <com.philpot.nowplayinghistory.info.bottomsheet.SongInfoBottomSheet
+                android:id="@+id/fragment_history_song_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/colorBackground"
+                android:clickable="true"
+                android:elevation="@dimen/default_elevation"
+                app:elevation="@dimen/default_elevation"
+                app:behavior_hideable="true"
+                app:behavior_peekHeight="104dp"
+                style="?attr/bottomSheetStyle"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fragment_history_bottom_sheet_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:src="@drawable/ic_play_white"
+                android:scaleX="0"
+                android:scaleY="0"
+                android:clickable="false"
+                app:layout_anchor="@id/fragment_history_song_info"
+                app:layout_anchorGravity="top|end" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:id="@+id/fragment_history_loading"
+            android:indeterminate="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:isGone="@{!loading}"
+            android:layout_gravity="center"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical"
-            android:background="@color/colorBackground"
-            android:clickable="true"
-            android:elevation="@dimen/default_elevation"
-            app:elevation="@dimen/default_elevation"
-            app:behavior_hideable="true"
-            app:behavior_peekHeight="104dp"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" />
+            app:isGone="@{hasContentToDisplay}">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fragment_history_bottom_sheet_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_vertical_margin"
-            android:src="@drawable/ic_play_white"
-            android:scaleX="0"
-            android:scaleY="0"
-            android:clickable="false"
-            app:layout_anchor="@id/fragment_history_song_info"
-            app:layout_anchorGravity="top|end" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <TextView
+                android:id="@+id/empty_garden"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Song History is Empty!"
+                android:textAppearance="?attr/textAppearanceHeadline5" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+
 
 
 </layout>

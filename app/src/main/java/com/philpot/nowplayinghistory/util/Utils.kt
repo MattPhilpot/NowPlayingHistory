@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.DisplayMetrics
 import android.widget.Toast
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.model.HistoryEntry
@@ -16,7 +17,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.util.TypedValue
 import android.view.View
-import com.philpot.nowplayinghistory.model.Song
+import android.view.WindowManager
+import com.philpot.nowplayinghistory.model.SongInfo
 
 
 /**
@@ -24,7 +26,7 @@ import com.philpot.nowplayinghistory.model.Song
  */
 object Utils {
 
-    fun startMusicAppIntent(context: Context, item: Song, preference: MusicAppPreference) {
+    fun startMusicAppIntent(context: Context, item: SongInfo, preference: MusicAppPreference) {
         if (preference == MusicAppPreference.None) {
             return
         }
@@ -32,28 +34,7 @@ object Utils {
         Utils.startMusicAppIntent(preference.packageName, getIntentFor(item), context)
     }
 
-    fun startMusicAppIntent(context: Context, entry: HistoryEntry, preference: MusicAppPreference) {
-        if (preference == MusicAppPreference.None) {
-            return
-        }
-
-        Utils.startMusicAppIntent(preference.packageName, getIntentFor(entry), context)
-    }
-
-    fun getIntentFor(entry: HistoryEntry): Intent {
-        val intent = Intent()
-
-        intent.action = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
-        intent.putExtra(SearchManager.QUERY, entry.artist + " " + entry.title)
-        intent.putExtra(MediaStore.EXTRA_MEDIA_FOCUS, "vnd.android.cursor.item/audio")
-        intent.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, entry.artist)
-        intent.putExtra(MediaStore.EXTRA_MEDIA_TITLE, entry.title)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-
-        return intent
-    }
-
-    fun getIntentFor(item: Song): Intent {
+    fun getIntentFor(item: SongInfo): Intent {
         val intent = Intent()
 
         intent.action = MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
@@ -116,5 +97,23 @@ object Utils {
         if (visibility != newVisibility) {
             visibility = newVisibility
         }
+    }
+
+    fun getNumberOfColumns(context: Context, maxColumns: Int = 3): Int {
+        val gridViewEntrySize = context.resources.getDimensionPixelSize(R.dimen.grip_view_entry_size)
+        val gridViewSpacing = context.resources.getDimensionPixelSize(R.dimen.activity_content_margin)
+
+        val displayMetrics = DisplayMetrics()
+
+        (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(displayMetrics)
+        var numColumns = (displayMetrics.widthPixels - gridViewSpacing) / (gridViewEntrySize + gridViewSpacing)
+
+        if (numColumns > maxColumns) {
+            numColumns = maxColumns
+        } else if (numColumns < 1) {
+            numColumns = 1
+        }
+
+        return numColumns
     }
 }

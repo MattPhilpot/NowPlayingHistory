@@ -17,12 +17,6 @@ import android.graphics.drawable.shapes.RoundRectShape
 import android.graphics.drawable.shapes.Shape
 import android.os.Build
 import android.os.Handler
-import android.support.annotation.AnimRes
-import android.support.annotation.ColorInt
-import android.support.annotation.DrawableRes
-import android.support.annotation.IntRange
-import android.support.annotation.LayoutRes
-import android.support.annotation.Nullable
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -36,7 +30,11 @@ import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.ViewFlipper
-import com.philpot.nowplayinghistory.BuildConfig
+import androidx.annotation.AnimRes
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.LayoutRes
+import androidx.annotation.Nullable
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.widget.CircleImageView
 
@@ -200,7 +198,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
     // ANIMATIONS **
     //**************
 
-    override fun setFlipInterval(@IntRange(from = 0) milliseconds: Int) {
+    override fun setFlipInterval(@androidx.annotation.IntRange(from = 0) milliseconds: Int) {
         super.setFlipInterval(milliseconds)
         mFlipInterval = milliseconds
     }
@@ -217,7 +215,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
         }
     }
 
-    private fun initInAnimation(@IntRange(from = 0) duration: Long) {
+    private fun initInAnimation(@androidx.annotation.IntRange(from = 0) duration: Long) {
         if (inAnimation == null)
             this.setInAnimation(context, R.anim.grow_from_middle_x_axis)
         super.getInAnimation().duration = duration
@@ -227,7 +225,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
             duration - anticipateInAnimationTime
     }
 
-    private fun initOutAnimation(@IntRange(from = 0) duration: Long) {
+    private fun initOutAnimation(@androidx.annotation.IntRange(from = 0) duration: Long) {
         if (outAnimation == null)
             this.setOutAnimation(context, R.anim.shrink_to_middle_x_axis)
         super.getOutAnimation().duration = duration
@@ -244,7 +242,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
         return this.initialLayoutAnimation
     }
 
-    private fun setInitialLayoutAnimation(@AnimRes animationResId: Int) {
+    private fun setInitialLayoutAnimation(animationResId: Int) {
         try {
             setInitialLayoutAnimation(if (animationResId > 0) AnimationUtils.loadAnimation(context, animationResId) else createScaleAnimation()) //Usage of the method it's faster (not read from disk)
             logDebugInfo("Initial animation is active!")
@@ -279,7 +277,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
         return rearImageAnimation
     }
 
-    private fun setRearImageAnimation(@AnimRes animationResId: Int) {
+    private fun setRearImageAnimation(animationResId: Int) {
         try {
             setRearImageAnimation(AnimationUtils.loadAnimation(context, if (animationResId > 0) animationResId else R.anim.scale_up))
             logDebugInfo("Rear animation is active!")
@@ -309,7 +307,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
      *
      * @param duration The duration in milliseconds
      */
-    fun setMainAnimationDuration(@IntRange(from = 0) duration: Long) {
+    fun setMainAnimationDuration(@androidx.annotation.IntRange(from = 0) duration: Long) {
         logDebugInfo("Setting mainAnimationDuration=" + duration)
         mainAnimationDuration = duration
         initInAnimation(duration)
@@ -330,7 +328,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
      *
      * @param duration The duration in milliseconds
      */
-    fun setInitialLayoutAnimationDuration(@IntRange(from = 0) duration: Long) {
+    fun setInitialLayoutAnimationDuration(@androidx.annotation.IntRange(from = 0) duration: Long) {
         logDebugInfo("Setting initialLayoutAnimationDuration=" + duration)
         this.initialLayoutAnimationDuration = duration
         initialLayoutAnimation?.duration = duration
@@ -350,7 +348,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
      *
      * @param duration The duration in milliseconds
      */
-    fun setRearImageAnimationDuration(@IntRange(from = 0) duration: Long) {
+    fun setRearImageAnimationDuration(@androidx.annotation.IntRange(from = 0) duration: Long) {
         logDebugInfo("Setting rearImageAnimationDuration=" + duration)
         this.rearImageAnimationDuration = duration
         rearImageAnimation?.duration = duration
@@ -377,7 +375,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
      *
      * @param time the anticipation time in milliseconds
      */
-    fun setAnticipateInAnimationTime(@IntRange(from = 0) time: Long) {
+    fun setAnticipateInAnimationTime(@androidx.annotation.IntRange(from = 0) time: Long) {
         logDebugInfo("Setting anticipateInAnimationTime=" + time)
         this.anticipateInAnimationTime = time
     }
@@ -396,7 +394,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
      *
      * @param delay the delay in milliseconds
      */
-    fun setRearImageAnimationDelay(@IntRange(from = 0) delay: Long) {
+    fun setRearImageAnimationDelay(@androidx.annotation.IntRange(from = 0) delay: Long) {
         logDebugInfo("Setting rearImageAnimationDelay=" + delay)
         this.rearImageAnimationDelay = delay
     }
@@ -478,7 +476,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
      * @param delay      any custom delay
      * @see .setEnabled
      */
-    fun flip(whichChild: Int, @IntRange(from = 0) delay: Long) {
+    fun flip(whichChild: Int, @androidx.annotation.IntRange(from = 0) delay: Long) {
         if (!isEnabled) {
             logDebugInfo("Can't flip while view is disabled")
             return
@@ -751,7 +749,8 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
 
     fun createBitmapFrom(flipImageDrawable: PictureDrawable, size: Float): Bitmap {
         val radius = Math.ceil(
-                TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size,
+                TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, size,
                         resources.displayMetrics).toDouble()).toInt()
         val bitmap = Bitmap.createBitmap(radius, radius, Bitmap.Config.ARGB_8888)
         flipImageDrawable.setBounds(0, 0, radius, radius)
@@ -787,7 +786,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
     }
 
     private fun logDebugInfo(message: String) {
-        if (BuildConfig.DEBUG) {
+        if (com.philpot.nowplayinghistory.BuildConfig.DEBUG) {
             Log.d(TAG, message)
         }
     }
@@ -853,7 +852,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
          * @see .stopLayoutAnimation
          */
         @JvmOverloads
-        fun resetLayoutAnimationDelay(enable: Boolean = true, @IntRange(from = 0) nextDelay: Long = DEFAULT_INITIAL_DELAY.toLong()) {
+        fun resetLayoutAnimationDelay(enable: Boolean = true, @androidx.annotation.IntRange(from = 0) nextDelay: Long = DEFAULT_INITIAL_DELAY.toLong()) {
             enableInitialAnimation = enable
             initialDelay = nextDelay
         }
@@ -920,7 +919,7 @@ class FlipImageView(context: Context, attrs: AttributeSet? = null) : ViewFlipper
          * @return `ShapeDrawable` with RoundRect shape
          */
         fun createRoundRectShapeDrawable(
-                @ColorInt color: Int, outerRadii: FloatArray, inset: RectF, innerRadii: FloatArray): ShapeDrawable {
+            @ColorInt color: Int, outerRadii: FloatArray, inset: RectF, innerRadii: FloatArray): ShapeDrawable {
             return createShapeDrawable(color, RoundRectShape(outerRadii, inset, innerRadii))
         }
 

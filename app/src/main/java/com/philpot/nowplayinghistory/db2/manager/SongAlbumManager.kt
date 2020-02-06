@@ -1,29 +1,29 @@
 package com.philpot.nowplayinghistory.db2.manager
 
 import android.graphics.Bitmap
-import com.philpot.nowplayinghistory.db.dao.AlbumInfoDao
-import com.philpot.nowplayinghistory.db.dao.SongInfoDao
-import com.philpot.nowplayinghistory.info.AlbumArtCacheProvider
-import com.philpot.nowplayinghistory.model.Album
+import android.util.LongSparseArray
+import com.philpot.nowplayinghistory.db2.dao.AlbumInfoDao
+import com.philpot.nowplayinghistory.db2.dao.SongInfoDao
+import com.philpot.nowplayinghistory.model.AlbumInfo
 import com.philpot.nowplayinghistory.model.HistoryEntry
-import com.philpot.nowplayinghistory.model.Song
+import com.philpot.nowplayinghistory.model.SongInfo
 
 /**
  * Created by MattPhilpot on 11/9/2017.
  */
+/*
 class SongAlbumManager(private val songInfoDao: SongInfoDao,
-                       private val albumInfoDao: AlbumInfoDao,
-                       private val albumArtProvider: AlbumArtCacheProvider) {
+                       private val albumInfoDao: AlbumInfoDao) {
 
     companion object {
-        private val songInfoMap = HashMap<String, Song>()
-        private val albumInfoMap = HashMap<String, Album>()
+        private val songInfoMap = LongSparseArray
+        private val albumInfoMap = HashMap<String, AlbumInfo>()
     }
 
     var allowLastFM = false
 
-    fun getSongInfoFor(entry: HistoryEntry): Song {
-        val key = SongInfoDao.getSongInfoKey(entry)
+    fun getSongInfoFor(entry: HistoryEntry): SongInfo {
+        //val key = SongInfoDao.getSongInfoKey(entry)
         songInfoMap[key]?.let {
             if (it.album?.albumBitmap == null) {
                 it.album = getAlbumInfoFor(it)
@@ -39,37 +39,37 @@ class SongAlbumManager(private val songInfoDao: SongInfoDao,
         }
     }
 
-    fun getAlbumInfoFor(song: Song): Album? {
-        song.album?.let {
-            val key = AlbumInfoDao.getAlbumKey(song.artist, it)
+    fun getAlbumInfoFor(songInfo: SongInfo): AlbumInfo? {
+        songInfo.album?.let {
+            val key = AlbumInfoDao.getAlbumKey(songInfo.artist, it)
             albumInfoMap[key]?.let {
                 if (it.albumBitmap == null) {
                     it.albumBitmap = getAlbumBitmapFor(it)
                 }
 
                 if (it.albumBitmap == null) {
-                    getAlbumInfoAsync(song)
+                    getAlbumInfoAsync(songInfo)
                 }
                 return it
             }
 
-            albumInfoDao.getAlbumInfoFrom(song)?.let {
+            albumInfoDao.getAlbumInfoFrom(songInfo)?.let {
                 it.albumBitmap = getAlbumBitmapFor(it)
                 albumInfoMap.put(key, it)
                 return it
             }
         }
 
-        getAlbumInfoAsync(song)
+        getAlbumInfoAsync(songInfo)
         return null
     }
 
-    private fun getAlbumInfoAsync(song: Song) {
+    private fun getAlbumInfoAsync(songInfo: SongInfo) {
         if (allowLastFM) {
-            albumArtProvider.getAlbumInfoAsync(song, object : AlbumArtCacheProvider.AlbumArtCallback {
-                override fun onAlbumArtLoaded(bitmap: Bitmap?, song: Song) {
-                    songInfoMap.put(SongInfoDao.getSongInfoKey(song), song)
-                    song.album?.let {
+            albumArtProvider.getAlbumInfoAsync(songInfo, object : AlbumArtCacheProvider.AlbumArtCallback {
+                override fun onAlbumArtLoaded(bitmap: Bitmap?, songInfo: SongInfo) {
+                    songInfoMap.put(SongInfoDao.getSongInfoKey(songInfo), songInfo)
+                    songInfo.album?.let {
                         albumInfoMap.put(AlbumInfoDao.getAlbumKey(it), it)
                     }
                 }
@@ -77,39 +77,40 @@ class SongAlbumManager(private val songInfoDao: SongInfoDao,
         }
     }
 
-    private fun getAlbumBitmapFor(album: Album): Bitmap? {
-        album.albumBitmap?.let {
+    private fun getAlbumBitmapFor(albumInfo: AlbumInfo): Bitmap? {
+        albumInfo.albumBitmap?.let {
             return it
         }
-        return albumArtProvider.attemptCacheFetch(album)
+        return albumArtProvider.attemptCacheFetch(albumInfo)
     }
 
-    private fun addInfoIfNeededAndReturn(key: String, song: Song): Song? {
+    private fun addInfoIfNeededAndReturn(key: String, songInfo: SongInfo): SongInfo? {
         if (songInfoMap[key] == null) {
-            songInfoMap.put(key, song)
+            songInfoMap.put(key, songInfo)
         }
 
         return songInfoMap[key]
     }
 
-    fun saveFavorite(song: Song) {
-        val key = SongInfoDao.getSongInfoKey(song)
-        addInfoIfNeededAndReturn(key, song)?.let {
-            it.favorite = song.favorite
+    fun saveFavorite(songInfo: SongInfo) {
+        val key = SongInfoDao.getSongInfoKey(songInfo)
+        addInfoIfNeededAndReturn(key, songInfo)?.let {
+            it.favorite = songInfo.favorite
             if (!it.favorite) {
                 it.isExpanded = false
             }
             songInfoMap[key] = it
-            songInfoDao.insertOrUpdate(song)
+            songInfoDao.insertOrUpdate(songInfo)
         }
     }
 
-    fun saveExpandedOrCollapsed(song: Song) {
-        val key = SongInfoDao.getSongInfoKey(song)
-        addInfoIfNeededAndReturn(key, song)?.let {
-            it.isExpanded = song.isExpanded
+    fun saveExpandedOrCollapsed(songInfo: SongInfo) {
+        val key = SongInfoDao.getSongInfoKey(songInfo)
+        addInfoIfNeededAndReturn(key, songInfo)?.let {
+            it.isExpanded = songInfo.isExpanded
             songInfoMap[key] = it
-            songInfoDao.insertOrUpdate(song)
+            songInfoDao.insertOrUpdate(songInfo)
         }
     }
 }
+*/

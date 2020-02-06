@@ -21,15 +21,15 @@ class SongInfoHistoryItemView(context: Context) : LinearLayout(context, null, 0)
     }
 
     fun updateWith(entry: HistoryEntry) {
-        val timestamp = context.getString(R.string.history_info_heard, Utils.formatDateTime(entry.timestamp))
-        bottom_sheet_song_history_item_time?.text = getDateAsString(entry.timestamp)
+        val timestamp = context.getString(R.string.history_info_heard, Utils.formatDateTime(entry.timestamp.millis))
+        bottom_sheet_song_history_item_time?.text = getDateAsString(entry.timestamp.millis)
         bottom_sheet_song_history_item_time_stamp?.text = timestamp
 
         entry.location?.let { location ->
             bottom_sheet_song_history_item_location?.setImageResource(R.drawable.ic_location_on_black)
             bottom_sheet_song_history_item_location?.setOnClickListener {
-                val songByString = context.getString(R.string.google_maps_song_by_artist, entry.title, entry.artist)
-                val uri = Uri.parse("geo:0,0?q=${location.latitude},${location.longitude}($songByString)")
+                //val songByString = context.getString(R.string.google_maps_song_by_artist, entry.title, entry.artist)
+                val uri = Uri.parse("geo:0,0?q=${location.latitude},${location.longitude}(testing)")
                 val mapIntent = Intent(Intent.ACTION_VIEW, uri)
                 mapIntent.`package` = "com.google.android.apps.maps"
                 if (mapIntent.resolveActivity(context.packageManager) != null) {

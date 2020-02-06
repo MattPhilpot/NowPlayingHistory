@@ -1,32 +1,10 @@
 package com.philpot.nowplayinghistory.info
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.Log
-import com.philpot.nowplayinghistory.BuildConfig
-import com.philpot.nowplayinghistory.db.dao.AlbumInfoDao
-import com.philpot.nowplayinghistory.db.dao.SongInfoDao
-import com.philpot.nowplayinghistory.lastfm.LfmError
-import com.philpot.nowplayinghistory.lastfm.LfmParameters
-import com.philpot.nowplayinghistory.lastfm.LfmRequest
-import com.philpot.nowplayinghistory.lastfm.api.LfmApi
-import com.philpot.nowplayinghistory.model.Album
-import com.philpot.nowplayinghistory.model.HistoryEntry
-import com.philpot.nowplayinghistory.model.Song
-import org.json.JSONArray
-import org.json.JSONObject
-import java.io.File
-
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.async
-import java.io.FileOutputStream
-import java.io.IOException
-import java.net.URL
-import java.util.*
 
 /**
  * Created by MattPhilpot on 11/8/2017.
  */
+/*
 class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
                             private val albumInfoDao: AlbumInfoDao,
                             private var cacheDirectory: String) : AlbumArtCacheProvider  {
@@ -52,14 +30,14 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
         }
     }
 
-    override fun getAlbumInfoAsync(song: Song, callback: AlbumArtCacheProvider.AlbumArtCallback?) {
+    override fun getAlbumInfoAsync(songInfo: SongInfo, callback: AlbumArtCacheProvider.AlbumArtCallback?) {
         async(CommonPool) {
-            attemptCacheFetch(song)?.let {
-                callback?.onAlbumArtLoaded(it, song)
+            attemptCacheFetch(songInfo)?.let {
+                callback?.onAlbumArtLoaded(it, songInfo)
                 return@async
             }
 
-            getAlbumInfo(song, callback)
+            getAlbumInfo(songInfo, callback)
         }
     }
 
@@ -67,15 +45,15 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
         return attemptCacheFetch(songInfoDao.getSongInfoFrom(entry))
     }
 
-    override fun attemptCacheFetch(song: Song): Bitmap? {
-        if (song.album == null) {
-            song.album = albumInfoDao.getAlbumInfoFrom(song)
+    override fun attemptCacheFetch(songInfo: SongInfo): Bitmap? {
+        if (songInfo.album == null) {
+            songInfo.album = albumInfoDao.getAlbumInfoFrom(songInfo)
         }
-        return attemptCacheFetch(song.album)
+        return attemptCacheFetch(songInfo.album)
     }
 
-    override fun attemptCacheFetch(album: Album?): Bitmap? {
-        album?.let { album ->
+    override fun attemptCacheFetch(albumInfo: AlbumInfo?): Bitmap? {
+        albumInfo?.let { album ->
             try {
                 album.albumArtPath?.let {
                     if (it.isNotBlank()) {
@@ -110,7 +88,7 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
         return retVal
     }
 
-    private fun getAlbumInfo(item: Song, callback: AlbumArtCacheProvider.AlbumArtCallback?, trimTitle: Boolean = false) {
+    private fun getAlbumInfo(item: SongInfo, callback: AlbumArtCacheProvider.AlbumArtCallback?, trimTitle: Boolean = false) {
         val params = LfmParameters()
         params.put("artist", item.artist)
         params.put("track", getSearchTitle(item.title, trimTitle))
@@ -132,24 +110,24 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
         })
     }
 
-    private fun getAlbumInfoFrom(song: Song,
+    private fun getAlbumInfoFrom(songInfo: SongInfo,
                                  trackResponse: JSONObject,
                                  params: LfmParameters,
                                  callback: AlbumArtCacheProvider.AlbumArtCallback?,
                                  repeatAttempt: Boolean) {
         try {
             val albumTitle = (((trackResponse["track"] as JSONObject).get("album")) as JSONObject).get("title").toString()
-            song.album = albumTitle
-            songInfoDao.insertOrUpdate(song)
-            song.album = albumInfoDao.getAlbumInfoFrom(song)
+            songInfo.album = albumTitle
+            songInfoDao.insertOrUpdate(songInfo)
+            songInfo.album = albumInfoDao.getAlbumInfoFrom(songInfo)
 
-            song.album?.let { albumInfo ->
+            songInfo.album?.let { albumInfo ->
                 params.put("album", albumTitle)
 
                 val request = LfmApi.album().getInfo(params)
                 request.executeWithListener(object : LfmRequest.LfmRequestListener() {
                     override fun onComplete(response: JSONObject) {
-                        asyncLoadAlbumArt(song, albumInfo, (((response.get("album") as JSONObject).get("image") as JSONArray)[1] as JSONObject).get("#text").toString(), callback)
+                        asyncLoadAlbumArt(songInfo, albumInfo, (((response.get("album") as JSONObject).get("image") as JSONArray)[1] as JSONObject).get("#text").toString(), callback)
                     }
 
                     override fun onError(error: LfmError) {
@@ -162,13 +140,13 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
 
         } catch (e: Exception) {
             if (!repeatAttempt) {
-                getAlbumInfo(song, callback, true)
+                getAlbumInfo(songInfo, callback, true)
             }
         }
     }
 
-    private fun asyncLoadAlbumArt(song: Song,
-                                  album: Album,
+    private fun asyncLoadAlbumArt(songInfo: SongInfo,
+                                  albumInfo: AlbumInfo,
                                   url: String?, callback: AlbumArtCacheProvider.AlbumArtCallback?) {
         url?.let {
             if (it.isNotBlank()) {
@@ -176,9 +154,9 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
                     try {
                         val inValue = URL(it)
                         val albumBitmap = BitmapFactory.decodeStream(inValue.openConnection()?.getInputStream())
-                        saveBitmapToCache(album, albumBitmap)
-                        song.album = album
-                        callback?.onAlbumArtLoaded(albumBitmap, song)
+                        saveBitmapToCache(albumInfo, albumBitmap)
+                        songInfo.album = albumInfo
+                        callback?.onAlbumArtLoaded(albumBitmap, songInfo)
 
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to load image", e)
@@ -188,7 +166,7 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
         }
     }
 
-    private fun saveBitmapToCache(item: Album, bitmap: Bitmap) {
+    private fun saveBitmapToCache(item: AlbumInfo, bitmap: Bitmap) {
         var saveName = UUID.randomUUID().toString() + ".png"
         var file = File(cacheDirectory, saveName)
         while (file.exists()) {
@@ -209,3 +187,4 @@ class NowPlayingArtProvider(private val songInfoDao: SongInfoDao,
         }
     }
 }
+ */

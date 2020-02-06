@@ -7,7 +7,7 @@ abstract class GenericDao<E> {
 
     //basic methods already implemented by this class
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insert(model: E)
+    abstract fun insert(model: E): Long
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insertAll(vararg model: E)
