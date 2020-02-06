@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="bgColor" format="color"/>
+    <attr name="textColor" format="color"/>
+    <attr name="metaTextColor" format="color"/>
+
+    <!-- CircleImageView attributes -->
     <declare-styleable name="CircleImageView">
+        <!-- Set the width of a border ring around the image -->
         <attr name="civ_border_width" format="dimension" />
+        <!-- Set the color of the border ring -->
         <attr name="civ_border_color" format="color" />
+        <!-- Whether or not the border will be inset or outset -->
         <attr name="civ_border_overlay" format="boolean" />
+        <!-- Set the background color of the circle -->
         <attr name="civ_fill_color" format="color" />
     </declare-styleable>
 

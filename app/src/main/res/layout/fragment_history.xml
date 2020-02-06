@@ -9,26 +9,19 @@
         <variable
             name="hasContentToDisplay"
             type="Boolean" />
-        <variable
-            name="viewModel"
-            type="com.philpot.nowplayinghistory.history2.History2ViewModel" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:isGone="@{!hasContentToDisplay}"
-            android:id="@+id/activity_main_root">
+            android:id="@+id/activity_main_root"
+            android:animateLayoutChanges="true">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fragment_history_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/viewholder_history_item" />
+
             <!--
             <View
                 android:id="@+id/fragment_history_shadow"
@@ -38,6 +31,21 @@
                 app:layout_anchor="@id/fragment_history_song_info"
                 app:layout_anchorGravity="top" />
             -->
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/fragment_history_swipe_refresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:isRefreshing="@{loading}">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fragment_history_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/viewholder_history_item" />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
             <com.philpot.nowplayinghistory.info.bottomsheet.SongInfoBottomSheet
                 android:id="@+id/fragment_history_song_info"
@@ -66,15 +74,6 @@
                 app:layout_anchorGravity="top|end" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        <androidx.core.widget.ContentLoadingProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:id="@+id/fragment_history_loading"
-            android:indeterminate="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:isGone="@{!loading}"
-            android:layout_gravity="center"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -87,7 +86,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Your Song History is Empty!"
-                android:textAppearance="?attr/textAppearanceHeadline5" />
+                android:textSize="30sp" />
 
         </LinearLayout>
     </FrameLayout>

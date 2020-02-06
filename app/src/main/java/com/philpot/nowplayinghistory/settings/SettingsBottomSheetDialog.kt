@@ -4,17 +4,18 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Switch
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.coroutine.CoroutineContextProvider
-import com.philpot.nowplayinghistory.databinding.LayoutSettings2Binding
 import com.philpot.nowplayinghistory.db2.NowPlayingDatabase
 import com.philpot.nowplayinghistory.db2.manager.ParameterManager
 import com.philpot.nowplayinghistory.model.MusicAppPreference
@@ -84,6 +85,21 @@ class SettingsBottomSheetDialog(context: Context,
             doLastFMCheckCangeListenerSetup()
 
 
+        }
+    }
+
+    override fun onAttachedToWindow() {
+        applyLayoutParams()
+        super.onAttachedToWindow()
+    }
+
+    private fun applyLayoutParams() {
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        linear_layout_bottom_sheet?.parent?.let {
+            BottomSheetBehavior.from(it as View).apply {
+                peekHeight = context.resources.displayMetrics.heightPixels
+                state = BottomSheetBehavior.STATE_EXPANDED
+            }
         }
     }
 

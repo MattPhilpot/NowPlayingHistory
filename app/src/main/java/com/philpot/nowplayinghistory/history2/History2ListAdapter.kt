@@ -37,9 +37,5 @@ class History2ListAdapter : RecyclerAdapter<HistoryItem, History2ViewHolder>(His
         return fmt.format(timestamp1) == fmt.format(timestamp2)
     }
 
-    override fun getSectionColor(position: Int): Int = Color.parseColor("#2196F3")
-
-    override fun getSectionTextColor(position: Int): Int = Color.WHITE
-
     override fun getSectionDrawable(position: Int): Int = 0
 }

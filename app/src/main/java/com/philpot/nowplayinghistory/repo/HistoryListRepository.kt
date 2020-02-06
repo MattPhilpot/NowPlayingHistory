@@ -11,6 +11,7 @@ import com.philpot.nowplayinghistory.model.HistoryItem
 class HistoryListRepository(private val historyDao: HistoryDao,
                             coroutineContextProvider: CoroutineContextProvider) : BaseRepository(coroutineContextProvider) {
 
-    val getHistory: LiveData<PagedList<HistoryItem>>
-        get() = LivePagedListBuilder(historyDao.getHistory(), 50).build()
+    fun getHistory() = databaseOnlyLiveData(
+        databaseQuery = { LivePagedListBuilder(historyDao.getHistory(), 50).build() }
+    )
 }

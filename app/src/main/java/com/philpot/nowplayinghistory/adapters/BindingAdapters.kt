@@ -3,6 +3,7 @@ package com.philpot.nowplayinghistory.adapters
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.api.load
 import com.philpot.nowplayinghistory.widget.favorite.FavoriteButton
 import com.philpot.nowplayinghistory.widget.flip.FlipImageView
@@ -17,6 +18,10 @@ fun bindIsGone(view: View, isGone: Boolean) {
     }
 }
 
+@BindingAdapter("isRefreshing")
+fun bindIsRefreshing(view: SwipeRefreshLayout, loading: Boolean) {
+    view.isRefreshing = loading
+}
 
 @BindingAdapter("imageFromUrl")
 fun bindImageFromUrl(view: ImageView, imageUrl: String?) {

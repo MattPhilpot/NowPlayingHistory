@@ -71,6 +71,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_non_favorite_black"
+                    android:tint="@color/colorPrimary"
                     app:isFavorite="@{viewModel.favorite}"
                     android:layout_marginStart="@dimen/default_padding"
                     android:layout_gravity="center_vertical" />

@@ -12,6 +12,7 @@ import com.philpot.nowplayinghistory.databinding.FragmentHistoryBinding
 import com.philpot.nowplayinghistory.fragment.NowPlayingFragment
 import com.philpot.nowplayinghistory.info.bottomsheet.SongInfoBottomSheet
 import com.philpot.nowplayinghistory.model.HistoryItem
+import com.philpot.nowplayinghistory.repo.SyncResult
 import com.philpot.nowplayinghistory.viewmodel.NowPlayingViewModelFactory
 import com.philpot.nowplayinghistory.widget.recycler.RecyclerViewHolder
 import com.philpot.nowplayinghistory.widget.recycler.RecyclerViewInitializer
@@ -39,6 +40,12 @@ class History2Fragment : NowPlayingFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentHistoryBinding.inflate(inflater, container, false).apply {
             RecyclerViewInitializer.initRecyclerView(context, fragmentHistoryList, adapter, RecyclerView.VERTICAL, true)
+            hasContentToDisplay = true
+            loading = true
+
+            fragmentHistorySwipeRefresh.setOnRefreshListener {
+                viewModel.refresh()
+            }
         }
 
         val bottomSheetBehavior = BottomSheetBehavior.from<SongInfoBottomSheet>(binding.fragmentHistorySongInfo)
@@ -91,11 +98,22 @@ class History2Fragment : NowPlayingFragment() {
     }
 
     private fun refreshContent() {
-        binding.loading = true
-        viewModel.historyList.observe(viewLifecycleOwner) { data ->
-            adapter.submitList(data)
-            binding.loading = false
-            binding.hasContentToDisplay = data.isNotEmpty() || adapter.itemCount > 0
+        viewModel.data().observe(viewLifecycleOwner) { result ->
+            when (result.status) {
+                SyncResult.Status.LOADING -> {
+                    binding.loading = true
+                    binding.hasContentToDisplay = true
+                }
+                SyncResult.Status.SUCCESS_LOCAL, SyncResult.Status.SUCCESS_REMOTE -> {
+                    binding.loading = false
+                    binding.hasContentToDisplay = result.data?.isNotEmpty() == true || adapter.itemCount > 0
+                    adapter.submitList(result.data)
+                }
+                SyncResult.Status.ERROR -> {
+                    binding.loading = false
+                    binding.hasContentToDisplay = false
+                }
+            }
         }
     }
 

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/linear_layout_bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:elevation="@dimen/default_elevation"
     android:background="@color/colorBackground"
@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/activity_main_option_settings"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+        android:textSize="20sp"
         android:layout_marginStart="@dimen/default_padding"
         android:layout_marginEnd="@dimen/default_padding"/>
 

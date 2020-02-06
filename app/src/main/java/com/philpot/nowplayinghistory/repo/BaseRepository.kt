@@ -7,6 +7,13 @@ import com.philpot.nowplayinghistory.coroutine.CoroutineContextProvider
 
 abstract class BaseRepository(protected val coroutineContextProvider: CoroutineContextProvider) {
 
+    fun <T> databaseOnlyLiveData(databaseQuery: () -> LiveData<T>): LiveData<SyncResult<T>> =
+        liveData(coroutineContextProvider.ioContext) {
+            emit(SyncResult.loading())
+            val source = databaseQuery.invoke().map { SyncResult.successLocal(it) }
+            emitSource(source)
+        }
+
     fun <T, A> resultLiveData(databaseQuery: () -> LiveData<T>,
                               networkCall: suspend () -> SyncResult<A>,
                               saveCallResult: suspend (A?) -> LiveData<SyncResult<T>>

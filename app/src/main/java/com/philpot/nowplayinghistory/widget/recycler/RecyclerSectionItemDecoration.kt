@@ -75,7 +75,9 @@ class RecyclerSectionItemDecoration(private val sectionCallback: SectionCallback
     private fun doBuildHeaderFor(parent: RecyclerView, title: String, position: Int): View {
         val headerView = (headerViewMap[title] ?: generateHeaderViewFor(parent, title)).apply {
             //findViewById<LinearLayout>(R.id.recycler_section_header_root)?.
-            setBackgroundColor(sectionCallback.getSectionColor(position))
+
+            //we enable this if we want to support different colors per section header
+            //setBackgroundColor(sectionCallback.getSectionColor(position))
             /*
             findViewById<ImageView>(R.id.list_item_section_image)?.apply {
                 val imageResId = sectionCallback.getSectionDrawable(position)
@@ -90,7 +92,8 @@ class RecyclerSectionItemDecoration(private val sectionCallback: SectionCallback
         }
         headerView.findViewById<TextView>(R.id.list_item_section_text).apply {
             text = title
-            setTextColor(sectionCallback.getSectionTextColor(position))
+            //we enable this if we want to support different text colors per section
+            //setTextColor(sectionCallback.getSectionTextColor(position))
         }
         fixLayoutSize(headerView, parent)
         return headerView
@@ -194,8 +197,8 @@ class RecyclerSectionItemDecoration(private val sectionCallback: SectionCallback
         var showColumnCount: Int
         fun isSection(position: Int): Boolean
         fun getSectionHeader(position: Int): CharSequence
-        fun getSectionColor(position: Int): Int
-        fun getSectionTextColor(position: Int): Int
+        //fun getSectionColor(position: Int): Int
+        //fun getSectionTextColor(position: Int): Int
         fun getSectionDrawable(position: Int): Int
     }
 }
