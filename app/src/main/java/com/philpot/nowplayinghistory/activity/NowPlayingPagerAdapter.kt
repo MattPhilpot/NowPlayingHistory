@@ -2,7 +2,7 @@ package com.philpot.nowplayinghistory.activity
 
 import android.app.Fragment
 import android.app.FragmentManager
-import android.support.v13.app.FragmentPagerAdapter
+import androidx.legacy.app.FragmentPagerAdapter
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.favorite.FavoriteFragment
 import com.philpot.nowplayinghistory.history.HistoryFragment

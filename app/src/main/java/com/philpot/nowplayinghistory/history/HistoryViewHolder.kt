@@ -3,7 +3,7 @@ package com.philpot.nowplayinghistory.history
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.View
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance

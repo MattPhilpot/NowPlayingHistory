@@ -3,8 +3,8 @@ package com.philpot.nowplayinghistory.settings
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.support.design.widget.BottomSheetDialog
-import android.support.v4.content.ContextCompat
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import androidx.core.content.ContextCompat
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter

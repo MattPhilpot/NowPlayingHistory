@@ -1,9 +1,9 @@
 package com.philpot.nowplayinghistory.util
 
 import android.app.Activity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.widget.RecyclerSectionItemDecoration
 import com.philpot.nowplayinghistory.widget.RecyclerViewPaginationListener

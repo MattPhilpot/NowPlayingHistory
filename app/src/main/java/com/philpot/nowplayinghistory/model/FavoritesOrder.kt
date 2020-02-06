@@ -1,6 +1,6 @@
 package com.philpot.nowplayinghistory.model
 
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import com.philpot.nowplayinghistory.R
 
 /**

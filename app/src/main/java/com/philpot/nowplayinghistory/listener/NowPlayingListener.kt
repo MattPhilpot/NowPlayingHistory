@@ -26,7 +26,7 @@ import com.philpot.nowplayinghistory.util.ShortcutHelper
 import org.greenrobot.eventbus.EventBus
 import android.location.LocationManager
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import com.philpot.nowplayinghistory.BuildConfig
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.model.HistoryItemLocation

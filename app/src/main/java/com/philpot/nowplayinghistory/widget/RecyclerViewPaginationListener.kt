@@ -1,7 +1,7 @@
 package com.philpot.nowplayinghistory.widget
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * Created by MattPhilpot on 11/7/2017.

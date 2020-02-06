@@ -3,7 +3,6 @@ package com.philpot.nowplayinghistory
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import com.github.salomonbrys.kodein.*
 import com.philpot.nowplayinghistory.db.StorIOSqliteOpenHelper
 import com.philpot.nowplayinghistory.db.dao.AlbumInfoDao
 import com.philpot.nowplayinghistory.db.dao.DaoCache
@@ -18,8 +17,14 @@ import com.philpot.nowplayinghistory.lastfm.Lfm
 import com.philpot.nowplayinghistory.model.AlbumInfo
 import com.philpot.nowplayinghistory.model.SongInfo
 import com.philpot.nowplayinghistory.model.HistoryItem
-import com.pushtorefresh.storio.sqlite.StorIOSQLite
+import com.pushtorefresh.storio3.sqlite.StorIOSQLite
 import com.squareup.leakcanary.LeakCanary
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.erased.bind
+import org.kodein.di.erased.instance
+import org.kodein.di.erased.provider
+import org.kodein.di.erased.singleton
 
 /**
  * Created by colse on 10/29/2017.

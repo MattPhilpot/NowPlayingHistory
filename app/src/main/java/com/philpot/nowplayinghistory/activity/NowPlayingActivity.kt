@@ -5,7 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
-import android.support.design.widget.Snackbar
+import com.google.android.material.snackbar.Snackbar
 import com.github.salomonbrys.kodein.android.KodeinActivity
 import com.philpot.nowplayinghistory.R
 import com.philpot.nowplayinghistory.model.HistoryItem
@@ -16,8 +16,8 @@ import android.view.MenuItem
 import com.philpot.nowplayinghistory.settings.SettingsBottomSheetDialog
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewPager
+import androidx.core.content.ContextCompat
+import androidx.viewpager.widget.ViewPager
 import com.github.salomonbrys.kodein.*
 import org.greenrobot.eventbus.EventBus
 
